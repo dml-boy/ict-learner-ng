@@ -1,35 +1,36 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+@import "tailwindcss";
 
 :root {
-  /* Premium Nigerian-Inspired Cyber Palette */
-  --primary: #059669; /* Emerald 600 */
+  /* Educational Platform - Light Mode Design System */
+  --primary: #059669; /* Emerald 600 - Traditional Nigerian Educational Green */
   --primary-light: #10b981;
-  --primary-glow: rgba(16, 185, 129, 0.25);
+  --primary-glow: rgba(16, 185, 129, 0.15);
   
-  --secondary: #d97706; /* Amber 600 */
-  --secondary-glow: rgba(217, 119, 6, 0.2);
+  --secondary: #0ea5e9; /* Sky 500 - Trustworthy blue */
+  --secondary-glow: rgba(14, 165, 233, 0.1);
   
-  --accent: #14b8a6; /* Teal 500 */
+  --accent: #f59e0b; /* Amber 500 - Attention/Action */
   
-  --background: #020617; /* Slate 950 */
-  --foreground: #f8fafc;
+  --background: #fdfdfd; /* Off-white for readability */
+  --foreground: #1e293b; /* Slate 800 - Good contrast for text */
   
-  --card-bg: rgba(15, 23, 42, 0.7);
-  --card-border: rgba(255, 255, 255, 0.08);
+  --card-bg: #ffffff;
+  --card-border: rgba(0, 0, 0, 0.06);
+  --card-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
 
-  /* Legacy & Compatibility Tokens */
-  --glass-bg: rgba(15, 23, 42, 0.6);
-  --glass-border: rgba(255, 255, 255, 0.08);
-  --text-muted: #94a3b8;
+  --glass-bg: rgba(255, 255, 255, 0.8);
+  --glass-border: rgba(255, 255, 255, 0.3);
+  --text-muted: #64748b;
   
   --font-main: 'Plus Jakarta Sans', sans-serif;
   --font-heading: 'Outfit', sans-serif;
   
   --radius-sm: 8px;
-  --radius-md: 16px;
-  --radius-lg: 24px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
   
-  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 * {
@@ -45,9 +46,10 @@ body {
   line-height: 1.6;
   min-height: 100vh;
   overflow-x: hidden;
+  /* Light subtle background patterns */
   background-image: 
-    radial-gradient(circle at 0% 0%, rgba(16, 185, 129, 0.1) 0%, transparent 35%),
-    radial-gradient(circle at 100% 100%, rgba(217, 119, 6, 0.05) 0%, transparent 35%);
+    radial-gradient(circle at 0% 0%, rgba(16, 185, 129, 0.03) 0%, transparent 30%),
+    radial-gradient(circle at 100% 100%, rgba(14, 165, 233, 0.03) 0%, transparent 30%);
   background-attachment: fixed;
 }
 
@@ -56,44 +58,33 @@ h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
   font-weight: 700;
   letter-spacing: -0.02em;
+  color: #0f172a;
 }
 
 .gradient-text {
-  background: linear-gradient(135deg, #fff 0%, #94a3b8 50%, var(--primary-light) 100%);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 /* Premium Glassmorphism */
-.glass {
-  background: var(--card-bg);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--card-border);
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
-  border-left: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: var(--radius-md);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
-}
+/* The original .glass class was removed as it's not in the new design */
 
+/* Card Components */
 .glass-card {
   background: var(--card-bg);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--card-border);
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
-  border-left: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: var(--radius-md);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+  box-shadow: var(--card-shadow);
   padding: 2.5rem;
   transition: var(--transition);
 }
 
 .glass-card:hover {
-  transform: translateY(-4px);
-  border-color: rgba(16, 185, 129, 0.3);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6), 0 0 20px var(--primary-glow);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  border-color: var(--primary-light);
 }
 
 /* Auth Specifics */
@@ -103,7 +94,7 @@ h1, h2, h3, h4, h5, h6 {
   align-items: center;
   justify-content: center;
   padding: 2rem;
-  background: radial-gradient(circle at center, rgba(16, 185, 129, 0.05) 0%, transparent 70%);
+  background-color: #f8fafc;
 }
 
 /* Buttons */
@@ -112,13 +103,14 @@ h1, h2, h3, h4, h5, h6 {
   align-items: center;
   justify-content: center;
   gap: 0.75rem;
-  padding: 0.875rem 1.75rem;
+  padding: 0.75rem 1.5rem;
   border-radius: var(--radius-sm);
   font-weight: 600;
   text-decoration: none;
   cursor: pointer;
   transition: var(--transition);
   border: 1px solid transparent;
+  font-size: 0.95rem;
 }
 
 .btn-primary {
@@ -129,19 +121,20 @@ h1, h2, h3, h4, h5, h6 {
 
 .btn-primary:hover {
   background: var(--primary-light);
-  transform: translateY(-2px);
+  transform: translateY(-1px);
   box-shadow: 0 6px 20px var(--primary-glow);
 }
 
 .btn-outline {
-  background: transparent;
-  border: 1px solid var(--card-border);
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
   color: var(--foreground);
 }
 
 .btn-outline:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: #f8fafc;
   border-color: var(--primary);
+  color: var(--primary);
 }
 
 /* Inputs */
@@ -152,18 +145,18 @@ h1, h2, h3, h4, h5, h6 {
 .label {
   display: block;
   font-size: 0.875rem;
-  font-weight: 500;
-  color: #94a3b8;
+  font-weight: 600;
+  color: #475569;
   margin-bottom: 0.5rem;
 }
 
 .input {
   width: 100%;
   padding: 0.75rem 1rem;
-  background: rgba(15, 23, 42, 0.5);
-  border: 1px solid var(--card-border);
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
   border-radius: var(--radius-sm);
-  color: white;
+  color: var(--foreground);
   font-size: 1rem;
   transition: var(--transition);
   outline: none;
@@ -171,7 +164,6 @@ h1, h2, h3, h4, h5, h6 {
 
 .input:focus {
   border-color: var(--primary);
-  background: rgba(15, 23, 42, 0.8);
   box-shadow: 0 0 0 4px var(--primary-glow);
 }
 
@@ -182,20 +174,21 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .animate-in {
-  animation: fadeIn 0.5s ease-out forwards;
+  animation: fadeIn 0.4s ease-out forwards;
 }
 
-/* Hide scrollbar but keep functionality */
+/* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 10px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--background);
+  background: #f1f5f9;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1e293b;
-  border-radius: 10px;
+  background: #cbd5e1;
+  border-radius: 5px;
+  border: 2px solid #f1f5f9;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #334155;
+  background: #94a3b8;
 }

@@ -1,12 +1,13 @@
 import Link from 'next/link';
 import styles from './Sidebar.module.css';
+import Image from 'next/image';
 
 export default function Sidebar() {
   return (
     <aside className={styles.sidebar}>
-      <div className={styles.logo}>
-        <h1 className="gradient-text">ICT Learner NG</h1>
-        <span className="tag-nigeria">Nigeria</span>
+      <div className={styles.logo} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <Image src="/logosm.svg" alt="ICT Learner NG" width={30} height={28} />
+        <span style={{ fontSize: '1.2rem', fontWeight: 900, color: '#044331', whiteSpace: 'nowrap' }}>ICT LEARNER NG</span>
       </div>
       
       <nav className={styles.nav}>

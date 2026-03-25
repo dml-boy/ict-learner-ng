@@ -4,9 +4,7 @@
   position: fixed;
   left: 0;
   top: 0;
-  background: var(--card-bg);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: #f8fafc; /* Slate 50 */
   border-right: 1px solid var(--card-border);
   display: flex;
   flex-direction: column;
@@ -45,8 +43,8 @@
 }
 
 .navLink:hover {
-  background: var(--glass-bg);
-  color: var(--foreground);
+  background: #f1f5f9; /* Slate 100 */
+  color: var(--primary);
   transform: translateX(4px);
 }
 

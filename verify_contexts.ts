@@ -28,13 +28,16 @@ async function verify() {
   const mod = await Module.create({
     title: 'Supply and Demand (Test)',
     content: 'Standard supply and demand content',
-    introduction: 'Welcome to Economics',
+    engage: 'Welcome to Economics: How does price affect your daily shopping?',
+    explore: 'Interactive market simulation activity.',
+    explain: 'Theoretical foundations of supply and demand curves.',
     topicId: topic._id,
     type: 'lesson',
-    contextualContent: {
+    elaborate: {
       'Trader': 'For a trader, supply and demand is about price action and volume.',
       'Regular Student': 'For a student, it is about the intersection of curves in a textbook.'
-    }
+    },
+    evaluate: 'Quick check on market equilibrium concept.'
   });
   console.log('Module created with contextual content');
 

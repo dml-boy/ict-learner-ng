@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function TeacherRegister() {
   const [name, setName] = useState('');
@@ -42,9 +43,9 @@ export default function TeacherRegister() {
         <div className="glass-card animate-in" style={{ maxWidth: '480px', textAlign: 'center' }}>
           <div style={{ fontSize: '4rem', marginBottom: '1.5rem' }}>📧</div>
           <h2 style={{ marginBottom: '1rem' }}>Professional Verification</h2>
-          <p style={{ color: '#94a3b8', marginBottom: '2rem' }}>
-            We&apos;ve sent a verification link to <strong>{email}</strong>. 
-            Teachers must verify their email before they can access the platform.
+          <p style={{ color: 'var(--text-muted)', marginBottom: '2rem', fontSize: '1rem', fontWeight: 500 }}>
+            We&apos;ve sent a verification link to <strong>{email}</strong>. <br />
+            Teachers must verify their email to access advanced educator tools.
           </p>
           <Link href="/login" className="btn btn-primary" style={{ width: '100%' }}>
             Go to Login
@@ -58,9 +59,11 @@ export default function TeacherRegister() {
     <div className="auth-container">
       <div className="glass-card animate-in" style={{ width: '100%', maxWidth: '440px' }}>
         <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
-          <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>👨‍🏫</div>
-          <h2 className="gradient-text">Teacher Access</h2>
-          <p style={{ color: '#94a3b8', fontSize: '0.9rem' }}>Join the community of ICT educators</p>
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
+            <Image src="/logosm.svg" alt="ICT Learner NG" width={50} height={46} />
+          </div>
+          <h2 style={{ fontSize: '1.8rem', fontWeight: 900, color: '#044331', marginBottom: '0.5rem', letterSpacing: '-0.3px' }}>Teacher Access</h2>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', fontWeight: 500 }}>Join the community of ICT educators</p>
         </div>
 
         <form onSubmit={handleSubmit}>
@@ -100,13 +103,15 @@ export default function TeacherRegister() {
 
           {error && (
             <div style={{ 
-              padding: '0.75rem', 
-              background: 'rgba(239, 68, 68, 0.1)', 
-              border: '1px solid rgba(239, 68, 68, 0.2)',
+              padding: '1rem', 
+              background: '#fef2f2', 
+              border: '1px solid #ef4444',
               borderRadius: 'var(--radius-sm)',
-              color: '#f87171',
+              color: '#991b1b',
               fontSize: '0.875rem',
-              marginBottom: '1.5rem'
+              marginBottom: '1.5rem',
+              textAlign: 'center',
+              fontWeight: 500
             }}>
               {error}
             </div>
@@ -117,13 +122,13 @@ export default function TeacherRegister() {
           </button>
         </form>
 
-        <p style={{ textAlign: 'center', color: '#94a3b8', fontSize: '0.9rem' }}>
-          Already have an account? <Link href="/login" style={{ color: 'var(--primary-light)', fontWeight: 600 }}>Sign In</Link>
+        <p style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+          Already have an account? <Link href="/login" style={{ color: 'var(--primary)', fontWeight: 700, textDecoration: 'none' }}>Sign In</Link>
         </p>
 
         <div style={{ marginTop: '2.5rem', paddingTop: '1.5rem', borderTop: '1px solid var(--card-border)', textAlign: 'center' }}>
-          <p style={{ fontSize: '0.8rem', color: '#64748b' }}>
-            Registering as a student? <Link href="/register/student" style={{ color: 'white', textDecoration: 'none' }}>Click here</Link>
+          <p style={{ fontSize: '0.85rem', color: '#64748b' }}>
+            Registering as a student? <Link href="/register/student" style={{ color: 'var(--primary)', fontWeight: 600, textDecoration: 'none' }}>Click here</Link>
           </p>
         </div>
       </div>

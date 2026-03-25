@@ -1,8 +1,9 @@
+'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
 import LiveEditor from '@/components/LiveEditor';
-
+import Image from 'next/image';
 interface Module {
   _id: string;
   title: string;
@@ -74,7 +75,7 @@ export default function StudentDashboard() {
           borderRadius: '50%',
           boxShadow: '0 0 30px var(--primary-glow)'
         }}>
-          🎓
+          <Image src="/logosm.svg" alt="ICT Learner NG" width={50} height={46} />
         </div>
         <h1 className="gradient-text" style={{ fontSize: '4.5rem', marginBottom: '1rem', lineHeight: '1.1' }}>
           Welcome, {userName}

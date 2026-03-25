@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import PriorKnowledgeCheck from '@/components/PriorKnowledgeCheck';
 
@@ -25,8 +25,8 @@ interface Module {
 
 
 
-export default function IntroPage() {
-  const { id } = useParams();
+export default function IntroPage({ params }: { params: Promise<{ id: string }> }) {
+  const [id, setId] = useState<string | null>(null);
   const router = useRouter();
   const { data: session } = useSession();
   const userId = (session?.user as { id?: string })?.id || 'guest';
@@ -36,6 +36,11 @@ export default function IntroPage() {
   const [reflection, setReflection] = useState('');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    params.then(p => setId(p.id));
+  }, [params]);
+
   useEffect(() => {
     if (id && userId !== 'guest') {
       Promise.all([
@@ -106,9 +111,9 @@ export default function IntroPage() {
   const steps = [
     { title: 'Engage',    icon: '🎯', content: module.engage,    color: 'var(--primary)' },
     { title: 'Explore',   icon: '🛠️', content: module.explore,   color: 'var(--secondary)' },
-    { title: 'Explain',   icon: '📖', content: module.explain,   color: 'var(--accent)' },
-    { title: 'Elaborate', icon: '🚀', content: (module.elaborate && module.elaborate[selectedContext]) || "Apply what you've learnt to your world!", color: 'var(--primary-light)' },
-    { title: 'Evaluate',  icon: '🤔', content: module.evaluate,  color: '#cbd5e1' },
+    { title: 'Explain',   icon: '📖', content: module.explain,   color: '#0891b2' }, // Cyan 600
+    { title: 'Elaborate', icon: '🚀', content: (module.elaborate && module.elaborate[selectedContext]) || "Apply what you've learnt to your world!", color: 'var(--accent)' },
+    { title: 'Evaluate',  icon: '🤔', content: module.evaluate,  color: '#64748b' },
   ];
 
   const nextStep = async () => {
@@ -117,7 +122,6 @@ export default function IntroPage() {
       setCurrentStep(next);
       await saveProgress(next);
     } else {
-      // Save final reflection before navigating
       await saveProgress(4, undefined, reflection);
       router.push(`/student/learn/${id}/quiz`);
     }
@@ -128,22 +132,32 @@ export default function IntroPage() {
   };
 
   return (
-    <div className="animate-fade-in" style={{ maxWidth: '900px', margin: '0 auto', padding: '3rem 1rem' }}>
+    <div className="animate-in" style={{ maxWidth: '900px', margin: '0 auto', padding: '1rem 0' }}>
       {/* 5E Step Indicator */}
-      <nav style={{ marginBottom: '3rem' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
+      <nav style={{ 
+        marginBottom: '3rem', 
+        position: 'sticky', 
+        top: '90px', 
+        zIndex: 50, 
+        background: 'rgba(253, 253, 253, 0.8)', 
+        backdropFilter: 'blur(8px)', 
+        padding: '1rem 0', 
+        borderRadius: 'var(--radius-md)' 
+      }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', padding: '0 1rem' }}>
           {steps.map((s, i) => (
             <div
               key={s.title}
               style={{
                 flex: 1,
                 textAlign: 'center',
-                color: i <= currentStep ? s.color : 'rgba(255,255,255,0.2)',
-                fontWeight: i === currentStep ? 700 : 400,
-                fontSize: '0.8rem',
+                color: i <= currentStep ? s.color : '#cbd5e1',
+                fontWeight: i === currentStep ? 800 : 500,
+                fontSize: '0.75rem',
                 textTransform: 'uppercase',
                 letterSpacing: '1px',
                 cursor: i < currentStep ? 'pointer' : 'default',
+                transition: 'all 0.3s ease'
               }}
               onClick={() => i < currentStep && setCurrentStep(i)}
             >
@@ -151,92 +165,112 @@ export default function IntroPage() {
             </div>
           ))}
         </div>
-        <div style={{ display: 'flex', gap: '8px', height: '4px' }}>
+        <div style={{ display: 'flex', gap: '8px', height: '6px', padding: '0 1rem' }}>
           {steps.map((s, i) => (
             <div
               key={i}
               style={{
                 flex: 1,
-                background: i <= currentStep ? s.color : 'rgba(255,255,255,0.1)',
-                borderRadius: '2px',
-                transition: 'all 0.4s ease',
-                boxShadow: i === currentStep ? `0 0 10px ${s.color}` : 'none',
+                background: i <= currentStep ? s.color : '#f1f5f9',
+                borderRadius: '10px',
+                transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+                boxShadow: i === currentStep ? `0 0 12px ${s.color}66` : 'none',
               }}
             />
           ))}
         </div>
-        {saving && <p style={{ textAlign: 'right', fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>Saving...</p>}
+        {saving && <p style={{ textAlign: 'right', fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.5rem', paddingRight: '1rem' }}>Saving progress...</p>}
       </nav>
 
       {/* Content Card */}
-      <div key={currentStep} className="glass-card animate-slide-up" style={{ minHeight: '420px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+      <div key={currentStep} className="glass-card animate-in" style={{ minHeight: '480px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', border: '1px solid #e2e8f0' }}>
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
-            <span style={{ fontSize: '2.5rem' }}>{steps[currentStep].icon}</span>
-            <h2 style={{ fontSize: '2rem', margin: 0 }}>{steps[currentStep].title}</h2>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', marginBottom: '2.5rem' }}>
+            <span style={{ fontSize: '3rem', filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.1))' }}>{steps[currentStep].icon}</span>
+            <div>
+              <p style={{ fontSize: '0.8rem', fontWeight: 700, color: steps[currentStep].color, textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '0.25rem' }}>Stage {currentStep + 1} of 5</p>
+              <h2 style={{ fontSize: '2.25rem', margin: 0, color: '#0f172a' }}>{steps[currentStep].title}</h2>
+            </div>
           </div>
 
-          <div style={{ fontSize: '1.15rem', lineHeight: '1.8', whiteSpace: 'pre-wrap', color: 'rgba(255,255,255,0.95)' }}>
+          <div style={{ fontSize: '1.2rem', lineHeight: '1.8', whiteSpace: 'pre-wrap', color: '#334155' }}>
             {steps[currentStep].content}
           </div>
 
           {/* Elaborate — personalization callout */}
           {currentStep === 3 && (
-            <div style={{ marginTop: '2rem', padding: '1.25rem', background: 'rgba(255,255,255,0.03)', borderRadius: 'var(--radius-sm)', borderLeft: `4px solid ${steps[3].color}` }}>
-              <p style={{ fontWeight: 600, color: steps[3].color, marginBottom: '0.25rem' }}>Your lens: {selectedContext}</p>
-              <p style={{ fontSize: '0.95rem', fontStyle: 'italic' }}>See how this concept maps to your world.</p>
+            <div style={{ marginTop: '2.5rem', padding: '1.5rem', background: '#f0f9ff', borderRadius: 'var(--radius-md)', border: '1px solid #bae6fd', borderLeft: `6px solid ${steps[3].color}` }}>
+              <p style={{ fontWeight: 700, color: '#0369a1', marginBottom: '0.5rem', fontSize: '1.1rem' }}>Personalized Insight: {selectedContext}</p>
+              <p style={{ fontSize: '1rem', color: '#0c4a6e', lineHeight: '1.6' }}>We&apos;ve contextualized this stage to help you apply ICT concepts directly to your world.</p>
             </div>
           )}
 
           {/* Evaluate — reflection input */}
           {currentStep === 4 && (
-            <div style={{ marginTop: '2rem' }}>
-              <label style={{ display: 'block', marginBottom: '0.75rem', fontWeight: 600, color: steps[4].color }}>
-                📝 Your Reflection (saved automatically)
+            <div style={{ marginTop: '2.5rem' }}>
+              <label style={{ display: 'block', marginBottom: '1rem', fontWeight: 700, color: '#475569', fontSize: '1.1rem' }}>
+                📝 Your Constructivist Reflection
               </label>
               <textarea
                 value={reflection}
                 onChange={(e) => setReflection(e.target.value)}
-                placeholder="What did you discover in this lesson? How will you apply it?"
-                rows={5}
+                placeholder="What did you discover in this lesson? How has your understanding changed?"
+                rows={6}
                 style={{
                   width: '100%',
-                  background: 'rgba(255,255,255,0.04)',
-                  border: '1px solid rgba(255,255,255,0.12)',
-                  borderRadius: '8px',
-                  color: 'white',
-                  padding: '1rem',
-                  fontSize: '1rem',
+                  background: '#f8fafc',
+                  border: '2px solid #e2e8f0',
+                  borderRadius: '12px',
+                  color: '#1e293b',
+                  padding: '1.25rem',
+                  fontSize: '1.05rem',
                   lineHeight: '1.6',
                   resize: 'vertical',
+                  transition: 'border-color 0.2s ease',
+                  outline: 'none'
                 }}
               />
+              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '0.75rem' }}>Your thoughts are automatically saved as you type.</p>
             </div>
           )}
         </div>
 
         {/* Navigation */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '2.5rem', borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '1.5rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '3rem', borderTop: '2px solid #f1f5f9', paddingTop: '2rem' }}>
           <button
             onClick={prevStep}
             disabled={currentStep === 0}
             className="btn btn-outline"
-            style={{ opacity: currentStep === 0 ? 0 : 1 }}
+            style={{ 
+              opacity: currentStep === 0 ? 0 : 1,
+              padding: '0.875rem 2rem',
+              borderRadius: '10px'
+            }}
           >
-            ← Previous
+            ← Previous Stage
           </button>
 
-          <button onClick={nextStep} className="btn btn-primary" style={{ background: steps[currentStep].color, borderColor: steps[currentStep].color }}>
+          <button 
+            onClick={nextStep} 
+            className="btn btn-primary" 
+            style={{ 
+              background: steps[currentStep].color, 
+              borderColor: steps[currentStep].color,
+              padding: '0.875rem 2.5rem',
+              borderRadius: '10px',
+              fontSize: '1.05rem'
+            }}
+          >
             {currentStep === steps.length - 1
-              ? 'Finish & Start Quiz →'
+              ? 'Complete & Start Quiz →'
               : `Next: ${steps[currentStep + 1].title} →`}
           </button>
         </div>
       </div>
 
-      <footer style={{ marginTop: '2rem', textAlign: 'center' }}>
-        <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-          <strong>{module.title}</strong> · Stage {currentStep + 1} of 5 · Context: {selectedContext}
+      <footer style={{ marginTop: '3rem', textAlign: 'center' }}>
+        <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', fontWeight: 500 }}>
+          Module: <span style={{ color: '#0f172a', fontWeight: 700 }}>{module ? module.title : ''}</span> · Perspective: <span style={{ color: 'var(--primary)', fontWeight: 700 }}>{selectedContext}</span>
         </p>
       </footer>
     </div>

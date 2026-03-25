@@ -1,14 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { auth } from '@/auth';
 import dbConnect from '@/lib/dbConnect';
 import UserProgress from '@/models/UserProgress';
 import Module from '@/models/Module';
 
 // GET student progress
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
+    const session = await auth();
+    if (!session?.user) {
+      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+    }
+
     await dbConnect();
-    const { searchParams } = new URL(request.url);
-    const userId = searchParams.get('userId') || 'default_student';
+    const userId = session.user.id;
 
     const progress = await UserProgress.find({ userId }).populate('moduleId');
     return NextResponse.json({ success: true, data: progress });
@@ -20,12 +25,19 @@ export async function GET(request: NextRequest) {
 // UPDATE student progress (Complete a module and unlock next)
 export async function POST(request: NextRequest) {
   try {
+    const session = await auth();
+    if (!session?.user) {
+      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+    }
+
     await dbConnect();
     const body = await request.json();
-    const { userId, moduleId, status, score, selectedContext, currentStep, reflection } = body;
+    const { moduleId, status, score, selectedContext, currentStep, reflection } = body;
 
-    if (!userId || !moduleId) {
-      return NextResponse.json({ success: false, error: 'UserId and ModuleId are required' }, { status: 400 });
+    const userId = session.user.id;
+
+    if (!moduleId) {
+      return NextResponse.json({ success: false, error: 'ModuleId is required' }, { status: 400 });
     }
 
     // Update current module progress
@@ -58,7 +70,7 @@ export async function POST(request: NextRequest) {
       if (currentModule && currentModule.nextModuleId) {
         await UserProgress.findOneAndUpdate(
           { userId, moduleId: currentModule.nextModuleId },
-          { status: 'in-progress' }, // or 'unlocked' if we had that state
+          { status: 'in-progress' },
           { upsert: true }
         );
       }

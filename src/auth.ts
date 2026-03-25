@@ -1,8 +1,6 @@
 import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
-import dbConnect from '@/lib/dbConnect';
-import User from '@/models/User';
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   session: { strategy: 'jwt' },
@@ -18,6 +16,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
+
+        // Dynamic imports to prevent Edge runtime errors in middleware
+        const { default: dbConnect } = await import('@/lib/dbConnect');
+        const { default: User } = await import('@/models/User');
 
         await dbConnect();
         const user = await User.findOne({ email: credentials.email });

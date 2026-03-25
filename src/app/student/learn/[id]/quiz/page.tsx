@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 interface Question {
   question: string;
@@ -16,14 +16,18 @@ interface Module {
   questions: Question[];
 }
 
-export default function QuizPage() {
-  const { id } = useParams();
+export default function QuizPage({ params }: { params: Promise<{ id: string }> }) {
+  const [id, setId] = useState<string | null>(null);
   const router = useRouter();
   const [module, setModule] = useState<Module | null>(null);
   const [loading, setLoading] = useState(true);
   const [answers, setAnswers] = useState<number[]>([]);
   const [submitted, setSubmitted] = useState(false);
   const [score, setScore] = useState(0);
+
+  useEffect(() => {
+    params.then(p => setId(p.id));
+  }, [params]);
 
   useEffect(() => {
     if (id) {

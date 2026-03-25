@@ -30,13 +30,12 @@ interface Module {
   topicId: { _id: string; title: string } | string;
   type: 'lesson' | 'activity' | 'project';
   constructivistNote: string;
-  // New Fields
-  priorKnowledge: string;
-  learningObjectives: string;
-  authenticTask: string;
-  scaffoldingTips: string;
-  reflectionQuestions: string;
-  contextualContent: Record<string, string>;
+  // 5E Framework
+  engage: string;
+  explore: string;
+  explain: string;
+  elaborate: Record<string, string>;
+  evaluate: string;
   createdAt: string;
 }
 
@@ -536,6 +535,14 @@ export default function TeacherDashboard() {
               value={modTitle}
               onChange={(e) => setModTitle(e.target.value)}
               className={styles.input}
+              required
+            />
+            
+            <textarea
+              placeholder="Brief introduction or overview content for this module..."
+              value={modContent}
+              onChange={(e) => setModContent(e.target.value)}
+              className={styles.textarea}
               required
             />
 

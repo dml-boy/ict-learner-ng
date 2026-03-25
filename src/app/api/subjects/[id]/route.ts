@@ -4,11 +4,12 @@ import Subject from '@/models/Subject';
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   await dbConnect();
   try {
-    const deletedSubject = await Subject.findByIdAndDelete(params.id);
+    const deletedSubject = await Subject.findByIdAndDelete(id);
     if (!deletedSubject) {
       return NextResponse.json({ success: false, error: 'Subject not found' }, { status: 404 });
     }
