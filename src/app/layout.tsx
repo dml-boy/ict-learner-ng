@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import Sidebar from "@/components/Sidebar";
+import Navbar from "@/components/Navbar";
+import Providers from "@/components/Providers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -17,9 +20,6 @@ export const metadata: Metadata = {
   description: "A platform to enhance ICT learning in Nigeria through active construction of knowledge.",
 };
 
-import Sidebar from "@/components/Sidebar";
-import Navbar from "@/components/Navbar";
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -28,13 +28,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        <Sidebar />
-        <div style={{ marginLeft: '280px', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-          <Navbar />
-          <main style={{ marginTop: '80px', padding: '2rem', flex: 1 }}>
-            {children}
-          </main>
-        </div>
+        <Providers>
+          <Sidebar />
+          <div style={{ marginLeft: '280px', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+            <Navbar />
+            <main style={{ marginTop: '80px', padding: '2rem', flex: 1 }}>
+              {children}
+            </main>
+          </div>
+        </Providers>
       </body>
     </html>
   );
