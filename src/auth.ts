@@ -31,6 +31,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           name: user.name,
           email: user.email,
           role: user.role,
+          isEmailVerified: user.isEmailVerified,
         };
       },
     }),
@@ -40,6 +41,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (user) {
         token.id = user.id;
         token.role = (user as { role?: string }).role;
+        token.isEmailVerified = (user as { isEmailVerified?: boolean }).isEmailVerified;
       }
       return token;
     },
@@ -47,6 +49,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (session.user) {
         session.user.id = token.id as string;
         (session.user as { role?: string }).role = token.role as string;
+        (session.user as { isEmailVerified?: boolean }).isEmailVerified = token.isEmailVerified as boolean;
       }
       return session;
     },

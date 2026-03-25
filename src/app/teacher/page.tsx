@@ -265,7 +265,7 @@ export default function TeacherDashboard() {
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
           <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Logged in as <strong style={{ color: 'white' }}>{teacherName}</strong></span>
-          <button onClick={() => signOut({ callbackUrl: '/login' })} className="btn-secondary" style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem' }}>
+          <button onClick={() => signOut({ callbackUrl: '/login' })} className="btn btn-outline" style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem' }}>
             Sign Out
           </button>
         </div>
@@ -368,7 +368,7 @@ export default function TeacherDashboard() {
               ))}
             </div>
 
-            <button type="submit" className="btn-primary" style={{ marginTop: '1rem' }}>Create Subject</button>
+            <button type="submit" className="btn btn-primary" style={{ marginTop: '1rem' }}>Create Subject</button>
           </form>
 
           <div className={styles.list}>
@@ -435,7 +435,7 @@ export default function TeacherDashboard() {
               <option value="Digital Literacy">Digital Literacy</option>
               <option value="Programming">Programming</option>
             </select>
-            <button type="submit" className="btn-primary" disabled={!topicSubId}>Add Topic</button>
+            <button type="submit" className="btn btn-primary" disabled={!topicSubId}>Add Topic</button>
           </form>
 
           <div className={styles.list}>
@@ -621,7 +621,7 @@ export default function TeacherDashboard() {
               className={styles.textarea}
             />
 
-            <button type="submit" className="btn-primary" style={{ marginTop: '2rem' }}>Publish 5E Module</button>
+            <button type="submit" className="btn btn-primary" style={{ marginTop: '2rem' }}>Publish 5E Module</button>
           </form>
 
           <div className={styles.list}>

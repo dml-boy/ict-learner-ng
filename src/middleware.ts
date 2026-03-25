@@ -10,7 +10,11 @@ export default auth((req) => {
     if (!session) {
       return NextResponse.redirect(new URL('/login?role=teacher', req.url));
     }
-    if ((session.user as { role?: string }).role !== 'teacher') {
+    const user = session.user as { role?: string; isEmailVerified?: boolean };
+    if (!user.isEmailVerified) {
+      return NextResponse.redirect(new URL('/login?error=unverified', req.url));
+    }
+    if (user.role !== 'teacher') {
       return NextResponse.redirect(new URL('/student', req.url));
     }
   }
@@ -19,6 +23,10 @@ export default auth((req) => {
   if (pathname.startsWith('/student')) {
     if (!session) {
       return NextResponse.redirect(new URL('/login?role=student', req.url));
+    }
+    const user = session.user as { isEmailVerified?: boolean };
+    if (!user.isEmailVerified) {
+      return NextResponse.redirect(new URL('/login?error=unverified', req.url));
     }
   }
 

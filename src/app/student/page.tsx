@@ -65,7 +65,7 @@ export default function StudentDashboard() {
         <div className="animate-float" style={{ 
           fontSize: '4rem', 
           marginBottom: '1.5rem',
-          background: 'rgba(99, 102, 241, 0.1)',
+          background: 'rgba(16, 185, 129, 0.1)',
           width: '100px',
           height: '100px',
           display: 'flex',
@@ -83,31 +83,31 @@ export default function StudentDashboard() {
           color: 'var(--text-muted)', 
           fontSize: '1.25rem', 
           maxWidth: '600px',
-          fontFamily: 'var(--font-alt)',
-          fontWeight: 300
+          fontFamily: 'var(--font-main)',
+          fontWeight: 400
         }}>
           Construct your knowledge through immersive modules and hands-on ICT challenges.
         </p>
-        <button onClick={() => signOut({ callbackUrl: '/login' })} className="btn-secondary" style={{ marginTop: '1.5rem', fontSize: '0.85rem' }}>
+        <button onClick={() => signOut({ callbackUrl: '/login' })} className="btn btn-outline" style={{ marginTop: '1.5rem', fontSize: '0.85rem', padding: '0.5rem 1rem' }}>
           Sign Out
         </button>
       </section>
 
-      {/* Progress Overview (Mock) */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1.5rem', marginBottom: '4rem' }}>
+      {/* Progress Overview */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem', marginBottom: '4rem' }}>
         <div className="glass-card" style={{ textAlign: 'center', padding: '1.5rem' }}>
           <h5 style={{ color: 'var(--text-muted)', fontSize: '0.8rem', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Courses</h5>
           <div style={{ fontSize: '2rem', fontWeight: 800 }}>{modules.length}</div>
         </div>
         <div className="glass-card" style={{ textAlign: 'center', padding: '1.5rem' }}>
           <h5 style={{ color: 'var(--text-muted)', fontSize: '0.8rem', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Completed</h5>
-          <div style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--secondary)' }}>
+          <div style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--primary-light)' }}>
             {progress.filter(p => p.status === 'completed').length}
           </div>
         </div>
         <div className="glass-card" style={{ textAlign: 'center', padding: '1.5rem' }}>
           <h5 style={{ color: 'var(--text-muted)', fontSize: '0.8rem', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Ongoing</h5>
-          <div style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--primary)' }}>
+          <div style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--secondary)' }}>
             {modules.length - progress.filter(p => p.status === 'completed').length}
           </div>
         </div>
@@ -176,7 +176,7 @@ export default function StudentDashboard() {
                   </div>
                   <button 
                     disabled={isLocked}
-                    className="btn-primary" 
+                    className="btn btn-primary" 
                     style={{ 
                       fontSize: '0.85rem', 
                       padding: '0.6rem 1.2rem',
@@ -198,7 +198,7 @@ export default function StudentDashboard() {
       {/* Quick Lab Section */}
       <section className="glass-card" style={{ 
         marginTop: '6rem', 
-        background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%)',
+        background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(217, 119, 6, 0.05) 100%)',
         border: '1px solid var(--primary-glow)'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', marginBottom: '2rem' }}>

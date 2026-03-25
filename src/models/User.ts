@@ -1,11 +1,12 @@
 import mongoose, { Schema, Document, Model } from 'mongoose';
 
 export interface IUser extends Document {
-  _id: string;
   name: string;
   email: string;
   passwordHash: string;
   role: 'teacher' | 'student';
+  isEmailVerified: boolean;
+  verificationToken?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -16,6 +17,8 @@ const UserSchema: Schema = new Schema(
     email: { type: String, required: true, unique: true, lowercase: true },
     passwordHash: { type: String, required: true },
     role: { type: String, enum: ['teacher', 'student'], default: 'student' },
+    isEmailVerified: { type: Boolean, default: false },
+    verificationToken: { type: String },
   },
   { timestamps: true }
 );
