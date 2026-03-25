@@ -83,7 +83,7 @@ export default function QuizPage() {
     return (
       <div className="glass-card" style={{ textAlign: 'center' }}>
         <h3>No activity for this module.</h3>
-        <button onClick={() => router.push('/student')} className="btn-primary" style={{ marginTop: '1rem' }}>Back to Dashboard</button>
+        <button onClick={() => router.push('/student')} className="btn btn-primary" style={{ marginTop: '1rem' }}>Back to Dashboard</button>
       </div>
     );
   }
@@ -144,8 +144,8 @@ export default function QuizPage() {
                         gap: '1rem', 
                         padding: '1.25rem', 
                         borderRadius: 'var(--radius-sm)', 
-                        background: answers[qIndex] === optIndex ? 'rgba(99, 102, 241, 0.1)' : 'rgba(255, 255, 255, 0.03)',
-                        border: answers[qIndex] === optIndex ? '1px solid var(--primary)' : '1px solid rgba(255,255,255,0.05)',
+                        background: answers[qIndex] === optIndex ? 'rgba(16, 185, 129, 0.1)' : 'rgba(255, 255, 255, 0.03)',
+                        border: answers[qIndex] === optIndex ? '1px solid var(--primary)' : '1px solid rgba(255,255,255,0.08)',
                         cursor: submitted ? 'default' : 'pointer',
                         transition: 'var(--transition)'
                       }}
@@ -190,8 +190,8 @@ export default function QuizPage() {
           <button 
             onClick={handleSubmit} 
             disabled={answers.includes(-1)}
-            className="btn-primary" 
-            style={{ padding: '1.5rem 5rem', fontSize: '1.25rem' }}
+            className="btn btn-primary" 
+            style={{ padding: '1.25rem 4rem', fontSize: '1.1rem' }}
           >
             Submit My Reflections
           </button>
@@ -208,8 +208,8 @@ export default function QuizPage() {
               </p>
               <button 
                 onClick={() => router.push('/student')} 
-                className="btn-primary"
-                style={{ background: 'linear-gradient(135deg, var(--secondary) 0%, #059669 100%)', boxShadow: '0 4px 12px var(--secondary-glow)' }}
+                className="btn btn-primary"
+                style={{ background: 'linear-gradient(135deg, var(--primary) 0%, #059669 100%)', boxShadow: '0 4px 12px var(--primary-glow)' }}
               >
                 Return to Hub →
               </button>
@@ -222,15 +222,14 @@ export default function QuizPage() {
               <div style={{ display: 'flex', gap: '1.5rem', justifyContent: 'center' }}>
                 <button 
                   onClick={() => window.location.reload()} 
-                  className="btn-primary" 
-                  style={{ background: 'var(--accent)', boxShadow: '0 4px 12px var(--accent-glow)' }}
+                  className="btn btn-primary" 
+                  style={{ background: 'var(--accent)', borderColor: 'var(--accent)', boxShadow: '0 4px 12px rgba(217, 119, 6, 0.3)' }}
                 >
                   Retry Activity
                 </button>
                 <button 
                   onClick={() => router.push(`/student/learn/${id}/intro`)} 
-                  className="btn-primary" 
-                  style={{ background: 'transparent', border: '1px solid var(--glass-highlight)' }}
+                  className="btn btn-outline" 
                 >
                   Review Intro
                 </button>

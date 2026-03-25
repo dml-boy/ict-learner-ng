@@ -26,11 +26,12 @@ export default function PriorKnowledgeCheck({ onSelect, options }: PriorKnowledg
           <button
             key={opt}
             onClick={() => setSelected(opt)}
-            className={`btn-secondary ${selected === opt ? 'active-context' : ''}`}
+            className={`btn btn-outline ${selected === opt ? 'active-context' : ''}`}
             style={{ 
               padding: '1.5rem', 
-              border: selected === opt ? '2px solid var(--primary)' : '1px solid var(--glass-border)',
-              background: selected === opt ? 'rgba(99, 102, 241, 0.1)' : 'var(--glass-bg)'
+              borderColor: selected === opt ? 'var(--primary)' : 'var(--glass-border)',
+              background: selected === opt ? 'rgba(16, 185, 129, 0.1)' : 'var(--glass-bg)',
+              color: selected === opt ? 'white' : 'var(--text-muted)'
             }}
           >
             {opt}
@@ -41,15 +42,15 @@ export default function PriorKnowledgeCheck({ onSelect, options }: PriorKnowledg
       <button
         onClick={() => onSelect(selected)}
         disabled={!selected}
-        className="btn-primary"
-        style={{ width: '100%', padding: '1rem' }}
+        className="btn btn-primary"
+        style={{ width: '100%', padding: '1rem', marginTop: '1rem' }}
       >
         Start Learning Contextually →
       </button>
 
       <style jsx>{`
         .active-context {
-          box-shadow: 0 0 15px rgba(99, 102, 241, 0.3);
+          box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
         }
       `}</style>
     </div>

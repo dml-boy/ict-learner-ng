@@ -106,9 +106,9 @@ export default function IntroPage() {
   const steps = [
     { title: 'Engage',    icon: '🎯', content: module.engage,    color: 'var(--primary)' },
     { title: 'Explore',   icon: '🛠️', content: module.explore,   color: 'var(--secondary)' },
-    { title: 'Explain',   icon: '📖', content: module.explain,   color: '#f59e0b' },
-    { title: 'Elaborate', icon: '🚀', content: (module.elaborate && module.elaborate[selectedContext]) || "Apply what you've learnt to your world!", color: 'var(--accent)' },
-    { title: 'Evaluate',  icon: '🤔', content: module.evaluate,  color: '#ec4899' },
+    { title: 'Explain',   icon: '📖', content: module.explain,   color: 'var(--accent)' },
+    { title: 'Elaborate', icon: '🚀', content: (module.elaborate && module.elaborate[selectedContext]) || "Apply what you've learnt to your world!", color: 'var(--primary-light)' },
+    { title: 'Evaluate',  icon: '🤔', content: module.evaluate,  color: '#cbd5e1' },
   ];
 
   const nextStep = async () => {
@@ -220,13 +220,13 @@ export default function IntroPage() {
           <button
             onClick={prevStep}
             disabled={currentStep === 0}
-            className="btn-secondary"
+            className="btn btn-outline"
             style={{ opacity: currentStep === 0 ? 0 : 1 }}
           >
             ← Previous
           </button>
 
-          <button onClick={nextStep} className="btn-primary" style={{ background: steps[currentStep].color }}>
+          <button onClick={nextStep} className="btn btn-primary" style={{ background: steps[currentStep].color, borderColor: steps[currentStep].color }}>
             {currentStep === steps.length - 1
               ? 'Finish & Start Quiz →'
               : `Next: ${steps[currentStep + 1].title} →`}
