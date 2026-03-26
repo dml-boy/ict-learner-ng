@@ -4,57 +4,142 @@
   position: fixed;
   left: 0;
   top: 0;
-  background: #f8fafc; /* Slate 50 */
+  background: white;
   border-right: 1px solid var(--card-border);
   display: flex;
   flex-direction: column;
-  padding: 2rem 1.5rem;
+  padding: 2.5rem 1.5rem;
   z-index: 100;
+  box-shadow: 10px 0 40px hsla(210, 40%, 96%, 0.5);
 }
 
 .logo {
-  margin-bottom: 3rem;
+  margin-bottom: 4rem;
   display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+  align-items: center;
+  gap: 1rem;
+  padding: 0 0.5rem;
 }
 
-.logo h1 {
-  font-size: 1.5rem;
-  letter-spacing: -0.5px;
+.logoIcon {
+  width: 48px;
+  height: 48px;
+  background: var(--primary-glow);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid hsla(158, 94%, 30%, 0.1);
+}
+
+.logoText {
+  display: flex;
+  flex-direction: column;
+}
+
+.brandName {
+  font-family: var(--font-heading);
+  font-weight: 900;
+  font-size: 1.1rem;
+  color: var(--foreground);
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.brandSub {
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: var(--primary);
+  letter-spacing: 0.15em;
+  margin-top: 2px;
 }
 
 .nav {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+}
+
+.navGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.navLabel {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.75rem;
+  padding-left: 1rem;
 }
 
 .navLink {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  padding: 0.75rem 1rem;
-  border-radius: var(--radius-md);
-  font-weight: 500;
+  gap: 1.25rem;
+  padding: 0.85rem 1.25rem;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
   color: var(--text-muted);
-  transition: all 0.2s ease;
+  transition: var(--transition);
+  position: relative;
+  overflow: hidden;
 }
 
 .navLink:hover {
-  background: #f1f5f9; /* Slate 100 */
+  background: hsla(210, 40%, 96%, 1);
   color: var(--primary);
   transform: translateX(4px);
 }
 
+.navLink.active {
+  background: var(--primary-glow);
+  color: var(--primary);
+}
+
 .icon {
-  font-size: 1.25rem;
+  font-size: 1.2rem;
+}
+
+.activeIndicator {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 20px;
+  background: var(--primary);
+  border-radius: 0 4px 4px 0;
 }
 
 .footer {
-  padding-top: 2rem;
-  border-top: 1px solid var(--card-border);
-  font-size: 0.75rem;
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.helpCard {
+  background: linear-gradient(135deg, hsla(199, 89%, 48%, 0.05) 0%, hsla(158, 94%, 30%, 0.05) 100%);
+  border: 1px solid var(--card-border);
+  padding: 1.25rem;
+  border-radius: var(--radius-md);
+  text-align: center;
+}
+
+.helpCard p {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--foreground);
+  margin: 0.5rem 0;
+}
+
+.copyright {
+  font-size: 0.7rem;
   color: var(--text-muted);
+  text-align: center;
+  font-weight: 500;
 }

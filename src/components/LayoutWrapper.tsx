@@ -27,9 +27,14 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
   return (
     <Providers>
       <Sidebar />
-      <div style={{ marginLeft: '280px', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ marginLeft: '280px', minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--background)' }}>
         <Navbar />
-        <main style={{ marginTop: '80px', padding: '2rem', flex: 1 }}>
+        <main style={{ 
+          marginTop: '90px', 
+          padding: '4rem', 
+          flex: 1,
+          animation: 'fadeIn 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards'
+        }}>
           {children}
         </main>
       </div>

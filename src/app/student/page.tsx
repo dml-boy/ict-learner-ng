@@ -56,73 +56,96 @@ export default function StudentDashboard() {
       {/* Hero Section */}
       <section style={{ 
         textAlign: 'center', 
-        padding: '4rem 1rem', 
+        padding: '5rem 1rem', 
         marginBottom: '4rem',
         position: 'relative',
         display: 'flex',
         flexDirection: 'column',
-        alignItems: 'center'
+        alignItems: 'center',
+        background: 'radial-gradient(circle at center, var(--primary-glow) 0%, transparent 70%)'
       }}>
         <div className="animate-float" style={{ 
           fontSize: '4rem', 
-          marginBottom: '1.5rem',
-          background: 'rgba(16, 185, 129, 0.1)',
-          width: '100px',
-          height: '100px',
+          marginBottom: '2rem',
+          background: 'rgba(255, 255, 255, 0.8)',
+          backdropFilter: 'blur(10px)',
+          width: '120px',
+          height: '120px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          borderRadius: '50%',
-          boxShadow: '0 0 30px var(--primary-glow)'
+          borderRadius: '30% 70% 70% 30% / 30% 30% 70% 70%',
+          boxShadow: '0 20px 40px var(--primary-glow)',
+          border: '1px solid var(--card-border)'
         }}>
-          <Image src="/logosm.svg" alt="ICT Learner NG" width={50} height={46} />
+          <Image src="/logosm.svg" alt="ICT Learner NG" width={60} height={56} />
         </div>
-        <h1 className="gradient-text" style={{ fontSize: '4.5rem', marginBottom: '1rem', lineHeight: '1.1' }}>
+        <h1 className="gradient-text" style={{ fontSize: '5rem', marginBottom: '1.5rem', lineHeight: '1', fontWeight: 900 }}>
           Welcome, {userName}
         </h1>
         <p style={{ 
           color: 'var(--text-muted)', 
-          fontSize: '1.25rem', 
-          maxWidth: '600px',
+          fontSize: '1.35rem', 
+          maxWidth: '700px',
           fontFamily: 'var(--font-main)',
-          fontWeight: 400
+          fontWeight: 500,
+          lineHeight: '1.6'
         }}>
-          Construct your knowledge through immersive modules and hands-on ICT challenges.
+          Step into your personalized constructivist learning environment. Forge your ICT expertise through active exploration and discovery.
         </p>
-        <button onClick={() => signOut({ callbackUrl: '/login' })} className="btn btn-outline" style={{ marginTop: '1.5rem', fontSize: '0.85rem', padding: '0.5rem 1rem' }}>
-          Sign Out
-        </button>
+        <div style={{ display: 'flex', gap: '1rem', marginTop: '2.5rem' }}>
+          <button onClick={() => router.push('/student/modules')} className="btn btn-primary">
+            Explore Modules
+          </button>
+          <button onClick={() => signOut({ callbackUrl: '/login' })} className="btn btn-outline">
+            Sign Out
+          </button>
+        </div>
       </section>
 
       {/* Progress Overview */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem', marginBottom: '4rem' }}>
-        <div className="glass-card" style={{ textAlign: 'center', padding: '1.5rem' }}>
-          <h5 style={{ color: 'var(--text-muted)', fontSize: '0.8rem', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Courses</h5>
-          <div style={{ fontSize: '2rem', fontWeight: 800 }}>{modules.length}</div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '2rem', marginBottom: '5rem' }}>
+        <div className="peak-card" style={{ textAlign: 'center' }}>
+          <h5 style={{ color: 'var(--text-muted)', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.75rem' }}>Modules Available</h5>
+          <div style={{ fontSize: '3rem', fontWeight: 900, color: 'var(--foreground)' }}>{modules.length}</div>
+          <div style={{ fontSize: '0.8rem', color: 'var(--primary)', fontWeight: 600, marginTop: '0.5rem' }}>Global Curriculum</div>
         </div>
-        <div className="glass-card" style={{ textAlign: 'center', padding: '1.5rem' }}>
-          <h5 style={{ color: 'var(--text-muted)', fontSize: '0.8rem', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Completed</h5>
-          <div style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--primary-light)' }}>
+        <div className="peak-card" style={{ textAlign: 'center' }}>
+          <h5 style={{ color: 'var(--text-muted)', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.75rem' }}>Mastered</h5>
+          <div style={{ fontSize: '3rem', fontWeight: 900, color: 'var(--secondary)' }}>
             {progress.filter(p => p.status === 'completed').length}
           </div>
+          <div style={{ fontSize: '0.8rem', color: 'var(--secondary)', fontWeight: 600, marginTop: '0.5rem' }}>Achievement Unlocked</div>
         </div>
-        <div className="glass-card" style={{ textAlign: 'center', padding: '1.5rem' }}>
-          <h5 style={{ color: 'var(--text-muted)', fontSize: '0.8rem', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Ongoing</h5>
-          <div style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--secondary)' }}>
+        <div className="peak-card" style={{ textAlign: 'center' }}>
+          <h5 style={{ color: 'var(--text-muted)', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.75rem' }}>In Progress</h5>
+          <div style={{ fontSize: '3rem', fontWeight: 900, color: 'var(--primary-light)' }}>
             {modules.length - progress.filter(p => p.status === 'completed').length}
           </div>
+          <div style={{ fontSize: '0.8rem', color: 'var(--primary-light)', fontWeight: 600, marginTop: '0.5rem' }}>Active Evolution</div>
         </div>
       </div>
 
-      <h3 style={{ fontSize: '2rem', marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-        <span style={{ color: 'var(--primary)' }}>✦</span> Current Modules
-      </h3>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '3rem' }}>
+        <div>
+          <h3 style={{ fontSize: '2.5rem', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <span style={{ color: 'var(--primary)' }}>✦</span> Learning Path
+          </h3>
+          <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>Sequential modules designed for cognitive scaffolding.</p>
+        </div>
+        <div className="tag-nigeria" style={{ padding: '0.6rem 1.5rem', fontSize: '0.8rem' }}>
+          NIGERIA ICT CURRICULUM v2.0
+        </div>
+      </div>
 
       {/* Module List */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: '2.5rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(380px, 1fr))', gap: '3rem' }}>
         {loading ? (
-          <div className="glass-card" style={{ textAlign: 'center', color: 'var(--text-muted)', gridColumn: '1 / -1' }}>
-            <p className="animate-pulse">Gathering your learning universe...</p>
+          <div className="peak-card" style={{ textAlign: 'center', color: 'var(--text-muted)', gridColumn: '1 / -1' }}>
+            <div className="animate-pulse" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
+              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '3px solid var(--primary-glow)', borderTopColor: 'var(--primary)', animation: 'spin 1s linear infinite' }}></div>
+              <p>Calibrating your learning universe...</p>
+            </div>
           </div>
         ) : modules.length > 0 ? (
           modules.map((mod) => {
@@ -133,80 +156,102 @@ export default function StudentDashboard() {
             return (
               <div 
                 key={mod._id} 
-                className="glass-card" 
+                className="peak-card" 
                 style={{ 
                   cursor: isLocked ? 'not-allowed' : 'pointer',
-                  opacity: isLocked ? 0.5 : 1,
-                  borderBottom: isCompleted ? '4px solid var(--secondary)' : (isLocked ? 'none' : '4px solid var(--primary)')
+                  opacity: isLocked ? 0.6 : 1,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  padding: '2.5rem'
                 }} 
                 onClick={() => !isLocked && router.push(`/student/learn/${mod._id}/intro`)}
               >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' }}>
-                  <div className="tag-nigeria" style={{ fontSize: '0.65rem' }}>
-                    {typeof mod.topicId === 'object' ? mod.topicId.title : 'General ICT'}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2rem' }}>
+                  <div className="tag-nigeria" style={{ fontSize: '0.7rem' }}>
+                    {typeof mod.topicId === 'object' ? mod.topicId.title : 'ICT CORE'}
                   </div>
-                  <div style={{ fontSize: '1.2rem' }}>
-                    {isCompleted ? '✅' : (isLocked ? '🔒' : '🔥')}
+                  <div style={{ 
+                    fontSize: '1.5rem', 
+                    background: isLocked ? 'var(--background)' : 'var(--primary-glow)',
+                    width: '44px',
+                    height: '44px',
+                    borderRadius: '12px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
+                    {isCompleted ? '✅' : (isLocked ? '🔒' : '🚀')}
                   </div>
                 </div>
                 
-                <h4 style={{ fontSize: '1.5rem', marginBottom: '1rem', color: isLocked ? 'inherit' : 'white' }}>
+                <h4 style={{ fontSize: '1.75rem', marginBottom: '1.25rem', color: isLocked ? 'var(--text-muted)' : 'var(--foreground)' }}>
                   {mod.title}
                 </h4>
                 
                 <p style={{ 
-                  fontSize: '0.95rem', 
+                  fontSize: '1rem', 
                   color: 'var(--text-muted)', 
-                  marginBottom: '2rem', 
-                  minHeight: '4rem',
-                  fontFamily: 'var(--font-alt)'
+                  marginBottom: '2.5rem', 
+                  minHeight: '4.5rem',
+                  lineHeight: '1.6'
                 }}>
-                  {mod.content.substring(0, 120)}{mod.content.length > 120 ? '...' : ''}
+                  {mod.content.substring(0, 140)}{mod.content.length > 140 ? '...' : ''}
                 </p>
                 
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto', paddingTop: '2rem', borderTop: '1px solid var(--card-border)' }}>
                   <div style={{ display: 'flex', flexDirection: 'column' }}>
-                    <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Status</span>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Status</span>
                     <span style={{ 
-                      fontSize: '0.9rem', 
-                      fontWeight: 700, 
+                      fontSize: '1rem', 
+                      fontWeight: 800, 
                       color: isCompleted ? 'var(--secondary)' : (isLocked ? 'var(--text-muted)' : 'var(--primary)')
                     }}>
-                      {isCompleted ? 'Mastered' : (isLocked ? 'Locked' : 'Available')}
+                      {isCompleted ? 'Mastered' : (isLocked ? 'Encrypted' : 'Available')}
                     </span>
                   </div>
                   <button 
                     disabled={isLocked}
-                    className="btn btn-primary" 
+                    className={isCompleted ? "btn btn-outline" : "btn btn-primary"} 
                     style={{ 
-                      fontSize: '0.85rem', 
-                      padding: '0.6rem 1.2rem',
+                      fontSize: '0.9rem', 
+                      padding: '0.75rem 1.5rem',
                     }}
                   >
-                    {isCompleted ? 'Review' : (isLocked ? 'Explore' : 'Jump In')}
+                    {isCompleted ? 'Review' : (isLocked ? 'Unlock' : 'Start Journey')}
                   </button>
                 </div>
               </div>
             );
           })
         ) : (
-          <div className="glass-card" style={{ textAlign: 'center', color: 'var(--text-muted)', gridColumn: '1 / -1' }}>
-            <p>No modules found in this sector. 🛰️</p>
+          <div className="peak-card" style={{ textAlign: 'center', color: 'var(--text-muted)', gridColumn: '1 / -1' }}>
+            <p style={{ fontSize: '1.25rem' }}>No modules found in this sector. 🛰️</p>
+            <button className="btn btn-outline" style={{ marginTop: '1.5rem' }}>Refresh Database</button>
           </div>
         )}
       </div>
 
       {/* Quick Lab Section */}
-      <section className="glass-card" style={{ 
-        marginTop: '6rem', 
-        background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(217, 119, 6, 0.05) 100%)',
-        border: '1px solid var(--primary-glow)'
+      <section className="peak-card" style={{ 
+        marginTop: '8rem', 
+        background: 'linear-gradient(135deg, hsla(158, 94%, 30%, 0.05) 0%, hsla(199, 89%, 48%, 0.05) 100%)',
+        padding: '4rem'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', marginBottom: '2rem' }}>
-          <div style={{ fontSize: '3rem' }}>⚡</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '2.5rem', marginBottom: '3.5rem' }}>
+          <div style={{ 
+            fontSize: '4rem', 
+            background: 'white', 
+            width: '100px', 
+            height: '100px', 
+            borderRadius: '24px', 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center',
+            boxShadow: '0 10px 30px rgba(0,0,0,0.05)'
+          }}>⚡</div>
           <div>
-            <h3 style={{ fontSize: '1.75rem', marginBottom: '0.25rem' }}>Interactive Sandbox</h3>
-            <p style={{ color: 'var(--text-muted)' }}>Apply your constructivist theories in real-time. No limits.</p>
+            <h3 style={{ fontSize: '2.25rem', marginBottom: '0.5rem' }}>Constructivist Sandbox</h3>
+            <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>Test your theories, build components, and experiment in a zero-risk lab environment.</p>
           </div>
         </div>
         <LiveEditor />

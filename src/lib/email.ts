@@ -1,13 +1,21 @@
-import { Resend } from 'resend';
+import nodemailer from 'nodemailer';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const transporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST,
+  port: parseInt(process.env.SMTP_PORT || '587'),
+  secure: process.env.SMTP_SECURE === 'true', // true for 465, false for other ports
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASSWORD,
+  },
+});
 
 export async function sendVerificationEmail(email: string, token: string, name: string) {
   const verifyUrl = `${process.env.NEXTAUTH_URL}/api/verify-email?token=${token}`;
 
   try {
-    await resend.emails.send({
-      from: 'ICT Learner NG <onboarding@resend.dev>', // Resend default testing sender
+    await transporter.sendMail({
+      from: process.env.SMTP_FROM || '"ICT Learner NG" <noreply@ictlearner.ng>',
       to: email,
       subject: 'Verify your ICT Learner NG account',
       html: `
@@ -25,7 +33,7 @@ export async function sendVerificationEmail(email: string, token: string, name: 
     });
     return { success: true };
   } catch (error) {
-    console.error('Resend Error:', error);
+    console.error('Nodemailer Error:', error);
     return { success: false, error };
   }
 }

@@ -1,71 +1,106 @@
 .navbar {
-  height: 80px;
+  height: 90px;
   position: fixed;
   top: 0;
   left: 280px;
   right: 0;
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: hsla(0, 0%, 100%, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--card-border);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 2rem;
+  padding: 0 4rem;
   z-index: 90;
 }
 
+.search {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 1rem;
+  font-size: 0.9rem;
+  opacity: 0.4;
+}
+
 .searchInput {
-  background: #f1f5f9;
-  border: 1px solid #e2e8f0;
-  border-radius: var(--radius-md);
-  padding: 0.6rem 1.2rem;
+  background: hsla(210, 40%, 96%, 1);
+  border: 2px solid transparent;
+  border-radius: var(--radius-sm);
+  padding: 0.8rem 1rem 0.8rem 2.8rem;
   color: var(--foreground);
-  width: 300px;
+  width: 320px;
+  font-size: 0.95rem;
+  font-weight: 500;
   outline: none;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 .searchInput:focus {
+  background: white;
   border-color: var(--primary);
-  width: 350px;
+  box-shadow: 0 0 0 6px var(--primary-glow);
+  width: 400px;
 }
 
 .actions {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 2rem;
 }
 
 .user {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 1.25rem;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-sm);
+  transition: var(--transition);
+}
+
+.user:hover {
+  background: hsla(158, 94%, 30%, 0.05);
 }
 
 .avatar {
-  width: 40px;
-  height: 40px;
-  background: var(--primary);
-  box-shadow: 0 4px 10px var(--primary-glow);
-  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+  box-shadow: 0 10px 20px var(--primary-glow);
+  border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
+  font-weight: 800;
+  font-size: 1.1rem;
   color: white;
+  transition: var(--transition);
+}
+
+.user:hover .avatar {
+  transform: rotate(10deg) scale(1.05);
 }
 
 .userInfo {
-  line-height: 1.2;
+  line-height: 1.4;
 }
 
 .userName {
-  font-weight: 600;
-  font-size: 0.9rem;
+  font-weight: 800;
+  font-size: 1rem;
+  color: var(--foreground);
 }
 
 .userRole {
-  font-size: 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 600;
   color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }

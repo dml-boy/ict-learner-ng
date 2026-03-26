@@ -75,7 +75,7 @@ export default function Home() {
               Login
             </Link>
             <Link href="/register/student" className="inline-block btn-fill-pill bg-[#044331] text-white py-2 px-6 rounded-full font-bold text-[0.95rem] transition-all shadow-[0_4px_10px_rgba(4,67,49,0.15)] hover:-translate-y-px hover:shadow-[0_6px_15px_rgba(4,67,49,0.2)] hover:opacity-90">
-              Signup
+              Signup 
             </Link>
           </div>
         </header>

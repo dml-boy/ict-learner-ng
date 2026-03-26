@@ -249,8 +249,8 @@ export default function TeacherDashboard() {
   if (loading) {
     return (
       <div className={styles.page}>
-        <h2 className="gradient-text" style={{ fontSize: '2.5rem' }}>Teacher Dashboard</h2>
-        <p style={{ color: 'var(--text-muted)', marginTop: '1rem' }}>Loading your content...</p>
+        <h2 className="gradient-text" style={{ fontSize: '2.5rem' }}>Teacher Hub</h2>
+        <p style={{ color: 'var(--text-muted)', marginTop: '1rem' }}>Initializing pedagogical systems...</p>
       </div>
     );
   }
@@ -259,28 +259,32 @@ export default function TeacherDashboard() {
     <div className={styles.page}>
       <div className={styles.header}>
         <div>
-          <h2 className="gradient-text" style={{ fontSize: '2.5rem' }}>Teacher Dashboard</h2>
-          <p style={{ color: 'var(--text-muted)' }}>Manage subjects, topics, and constructivist modules with AI assistance.</p>
+          <h2 className="gradient-text" style={{ fontSize: '3.5rem', marginBottom: '0.5rem' }}>Teacher Hub</h2>
+          <p style={{ color: 'var(--text-muted)', fontSize: '1.2rem' }}>Architecting the next generation of ICT excellence through constructivist design.</p>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-          <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Logged in as <strong style={{ color: 'white' }}>{teacherName}</strong></span>
-          <button onClick={() => signOut({ callbackUrl: '/login' })} className="btn btn-outline" style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
+          <div style={{ textAlign: 'right' }}>
+            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Authenticated</p>
+            <p style={{ fontWeight: 800, fontSize: '1.1rem' }}>{teacherName}</p>
+          </div>
+          <button onClick={() => signOut({ callbackUrl: '/login' })} className="btn btn-outline" style={{ padding: '0.6rem 1.2rem' }}>
             Sign Out
           </button>
         </div>
-        <div className={styles.stats}>
-          <div className={styles.stat}>
-            <span className={styles.statNum}>{subjects.length}</span>
-            <span className={styles.statLabel}>Subjects</span>
-          </div>
-          <div className={styles.stat}>
-            <span className={styles.statNum}>{topics.length}</span>
-            <span className={styles.statLabel}>Topics</span>
-          </div>
-          <div className={styles.stat}>
-            <span className={styles.statNum}>{modules.length}</span>
-            <span className={styles.statLabel}>Modules</span>
-          </div>
+      </div>
+
+      <div className={styles.stats}>
+        <div className={styles.stat}>
+          <div className={styles.statNum}>{subjects.length}</div>
+          <div className={styles.statLabel}>Subjects</div>
+        </div>
+        <div className={styles.stat}>
+          <div className={styles.statNum}>{topics.length}</div>
+          <div className={styles.statLabel}>Topics</div>
+        </div>
+        <div className={styles.stat}>
+          <div className={styles.statNum}>{modules.length}</div>
+          <div className={styles.statLabel}>5E Modules</div>
         </div>
       </div>
 
@@ -290,7 +294,7 @@ export default function TeacherDashboard() {
           className={`${styles.tab} ${activeTab === 'subjects' ? styles.tabActive : ''}`}
           onClick={() => setActiveTab('subjects')}
         >
-          📁 Subjects
+          📂 Subjects
         </button>
         <button
           className={`${styles.tab} ${activeTab === 'topics' ? styles.tabActive : ''}`}
@@ -302,90 +306,115 @@ export default function TeacherDashboard() {
           className={`${styles.tab} ${activeTab === 'modules' ? styles.tabActive : ''}`}
           onClick={() => setActiveTab('modules')}
         >
-          📦 Modules
+          ✨ 5E Modules
         </button>
       </div>
 
       {/* SUBJECTS TAB */}
       {activeTab === 'subjects' && (
         <div className={styles.content}>
-          <form onSubmit={handleAddSubject} className={`glass-card ${styles.form}`}>
-            <h3>Add New Subject</h3>
+          <form onSubmit={handleAddSubject} className={`peak-card ${styles.form}`}>
+            <h3 style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              <span style={{ color: 'var(--primary)' }}>➕</span> Create New Subject
+            </h3>
             <div className={styles.formRow}>
-              <input
-                type="text"
-                placeholder="Subject title (e.g., Computer Science)"
-                value={subTitle}
-                onChange={(e) => setSubTitle(e.target.value)}
-                className={styles.input}
-                style={{ flex: 3 }}
+              <div style={{ flex: 3 }}>
+                <label className={styles.label}>Subject Title</label>
+                <input
+                  type="text"
+                  placeholder="e.g., Computer Science"
+                  value={subTitle}
+                  onChange={(e) => setSubTitle(e.target.value)}
+                  className={styles.input}
+                  required
+                />
+              </div>
+              <div style={{ flex: 1 }}>
+                <label className={styles.label}>Icon</label>
+                <input
+                  type="text"
+                  placeholder="💻"
+                  value={subIcon}
+                  onChange={(e) => setSubIcon(e.target.value)}
+                  className={styles.input}
+                />
+              </div>
+              <div style={{ flex: 1 }}>
+                <label className={styles.label}>Brand Color</label>
+                <input
+                  type="color"
+                  value={subColor}
+                  onChange={(e) => setSubColor(e.target.value)}
+                  className={styles.input}
+                  style={{ padding: '0.4rem', height: '54px' }}
+                />
+              </div>
+            </div>
+            <div>
+              <label className={styles.label}>Syllabus Overview</label>
+              <textarea
+                placeholder="Describe the overall scope and pedagogical goals of this subject..."
+                value={subDesc}
+                onChange={(e) => setSubDesc(e.target.value)}
+                className={styles.textarea}
                 required
               />
-              <input
-                type="text"
-                placeholder="Icon (e.g., 💻)"
-                value={subIcon}
-                onChange={(e) => setSubIcon(e.target.value)}
-                className={styles.input}
-                style={{ flex: 1 }}
-              />
-              <input
-                type="color"
-                value={subColor}
-                onChange={(e) => setSubColor(e.target.value)}
-                className={styles.input}
-                style={{ flex: 1, padding: '0.25rem', height: '45px' }}
-              />
             </div>
-            <textarea
-              placeholder="Describe the overall scope of this subject..."
-              value={subDesc}
-              onChange={(e) => setSubDesc(e.target.value)}
-              className={styles.textarea}
-              required
-            />
-            <div className={styles.label}>Subject Contexts (Student Roles)</div>
-            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>
-              Define the different backgrounds/roles students might have for this subject (e.g. &quot;Trader&quot;, &quot;Policy Maker&quot;).
-            </p>
-            <div className={styles.formRow}>
-              <input
-                type="text"
-                placeholder="New context (e.g. Student)"
-                value={currentSubContext}
-                onChange={(e) => setCurrentSubContext(e.target.value)}
-                className={styles.input}
-              />
-              <button type="button" onClick={addSubContext} className="btn-secondary">Add</button>
-            </div>
-            <div className={styles.contextList} style={{ marginTop: '0.5rem' }}>
-              {subContexts.map(ctx => (
-                <div key={ctx} className={styles.contextTag}>
-                  {ctx} 
-                  <span className={styles.removeTag} onClick={() => removeSubContext(ctx)}>✕</span>
+            
+            <div>
+              <label className={styles.label}>
+                Adaptive Contexts (Student Roles)
+                <div className={styles.tooltipContainer}>
+                  <div className={styles.infoIcon}>?</div>
+                  <div className={styles.tooltipText}>Define the different backgrounds or roles your students might have. This enables AI and content to adapt to their real-world needs.</div>
                 </div>
-              ))}
+              </label>
+              <div className={styles.formRow}>
+                <input
+                  type="text"
+                  placeholder="Add role (e.g. Graphic Designer, Market Trader, Data Entry Clerk)"
+                  value={currentSubContext}
+                  onChange={(e) => setCurrentSubContext(e.target.value)}
+                  className={styles.input}
+                />
+                <button type="button" onClick={addSubContext} className="btn btn-outline" style={{ minWidth: '120px' }}>Add Role</button>
+              </div>
+              <div className={styles.contextList} style={{ marginTop: '1.5rem' }}>
+                {subContexts.map(ctx => (
+                  <div key={ctx} className={styles.contextTag}>
+                    {ctx} 
+                    <span className={styles.removeTag} onClick={() => removeSubContext(ctx)}>✕</span>
+                  </div>
+                ))}
+              </div>
             </div>
 
-            <button type="submit" className="btn btn-primary" style={{ marginTop: '1rem' }}>Create Subject</button>
+            <button type="submit" className="btn btn-primary" style={{ marginTop: '1rem', alignSelf: 'flex-start' }}>
+              Finalize Subject
+            </button>
           </form>
 
           <div className={styles.list}>
             {subjects.length === 0 ? (
-              <div className="glass-card" style={{ textAlign: 'center', color: 'var(--text-muted)' }}>
-                <p>No subjects yet. Create your first subject above!</p>
+              <div className="peak-card" style={{ textAlign: 'center', color: 'var(--text-muted)', gridColumn: '1 / -1' }}>
+                <p>No subjects defined. Begin by creating your first academic sector.</p>
               </div>
             ) : (
               subjects.map((sub) => (
-                <div key={sub._id} className={`glass-card ${styles.card}`} style={{ borderLeft: `8px solid ${sub.color}` }}>
+                <div key={sub._id} className={`peak-card ${styles.card}`} style={{ borderBottom: `4px solid ${sub.color}` }}>
                   <div className={styles.cardHeader}>
                     <div style={{ display: 'flex', alignItems: 'center' }}>
-                      <span className={styles.subjectIcon}>{sub.icon}</span>
-                      <h4>{sub.title}</h4>
+                      <div className={styles.subjectIcon}>{sub.icon}</div>
+                      <h4 style={{ fontSize: '1.75rem' }}>{sub.title}</h4>
                     </div>
                     <button onClick={() => handleDeleteSubject(sub._id)} className={styles.deleteBtn}>✕</button>
                   </div>
                   <p className={styles.cardDesc}>{sub.description}</p>
+                  <div className={styles.contextList}>
+                    {sub.allowedContexts.map(ctx => (
+                      <span key={ctx} className="tag-nigeria" style={{ fontSize: '0.65rem' }}>{ctx}</span>
+                    ))}
+                  </div>
                 </div>
               ))
             )}
@@ -396,58 +425,74 @@ export default function TeacherDashboard() {
       {/* TOPICS TAB */}
       {activeTab === 'topics' && (
         <div className={styles.content}>
-          <form onSubmit={handleAddTopic} className={`glass-card ${styles.form}`}>
-            <h3>Add New Topic</h3>
-            <select
-              value={topicSubId}
-              onChange={(e) => setTopicSubId(e.target.value)}
-              className={styles.select}
-              required
-            >
-              <option value="">Select Parent Subject</option>
-              {subjects.map((s) => (
-                <option key={s._id} value={s._id}>{s.icon} {s.title}</option>
-              ))}
-            </select>
-            <input
-              type="text"
-              placeholder="Topic title (e.g., Introduction to HTML)"
-              value={topicTitle}
-              onChange={(e) => setTopicTitle(e.target.value)}
-              className={styles.input}
-              required
-            />
-            <textarea
-              placeholder="Describe the topic and its learning objectives..."
-              value={topicDesc}
-              onChange={(e) => setTopicDesc(e.target.value)}
-              className={styles.textarea}
-              required
-            />
-            <select
-              value={topicCategory}
-              onChange={(e) => setTopicCategory(e.target.value)}
-              className={styles.select}
-            >
-              <option value="General ICT">General ICT</option>
-              <option value="Web Development">Web Development</option>
-              <option value="Digital Literacy">Digital Literacy</option>
-              <option value="Programming">Programming</option>
-            </select>
-            <button type="submit" className="btn btn-primary" disabled={!topicSubId}>Add Topic</button>
+          <form onSubmit={handleAddTopic} className={`peak-card ${styles.form}`}>
+            <h3><span style={{ color: 'var(--primary)' }}>📖</span> Define New Topic</h3>
+            <div className={styles.formRow}>
+              <div style={{ flex: 1 }}>
+                <label className={styles.label}>Parent Subject</label>
+                <select
+                  value={topicSubId}
+                  onChange={(e) => setTopicSubId(e.target.value)}
+                  className={styles.select}
+                  required
+                >
+                  <option value="">Select Sector</option>
+                  {subjects.map((s) => (
+                    <option key={s._id} value={s._id}>{s.icon} {s.title}</option>
+                  ))}
+                </select>
+              </div>
+              <div style={{ flex: 1 }}>
+                <label className={styles.label}>Category</label>
+                <select
+                  value={topicCategory}
+                  onChange={(e) => setTopicCategory(e.target.value)}
+                  className={styles.select}
+                >
+                  <option value="General ICT">General ICT</option>
+                  <option value="Web Development">Web Development</option>
+                  <option value="Digital Literacy">Digital Literacy</option>
+                  <option value="Programming">Programming</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <label className={styles.label}>Topic Title</label>
+              <input
+                type="text"
+                placeholder="e.g., Introduction to Cloud Systems"
+                value={topicTitle}
+                onChange={(e) => setTopicTitle(e.target.value)}
+                className={styles.input}
+                required
+              />
+            </div>
+            <div>
+              <label className={styles.label}>Learning Objectives</label>
+              <textarea
+                placeholder="What should the students understand following this topic?"
+                value={topicDesc}
+                onChange={(e) => setTopicDesc(e.target.value)}
+                className={styles.textarea}
+                required
+              />
+            </div>
+            <button type="submit" className="btn btn-primary" disabled={!topicSubId} style={{ alignSelf: 'flex-start' }}>
+              Register Topic
+            </button>
           </form>
 
           <div className={styles.list}>
             {topics.length === 0 ? (
-              <div className="glass-card" style={{ textAlign: 'center', color: 'var(--text-muted)' }}>
-                <p>No topics yet. Create your first topic above!</p>
+              <div className="peak-card" style={{ textAlign: 'center', color: 'var(--text-muted)', gridColumn: '1 / -1' }}>
+                <p>No topics listed. Populate your subjects with specific learning areas.</p>
               </div>
             ) : (
               topics.map((topic) => (
-                <div key={topic._id} className={`glass-card ${styles.card}`}>
+                <div key={topic._id} className={`peak-card ${styles.card}`}>
                   <div className={styles.cardHeader}>
                     <div>
-                      <h4>{topic.title}</h4>
+                      <h4 style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>{topic.title}</h4>
                       <span className="tag-nigeria">{topic.category}</span>
                     </div>
                     <button onClick={() => handleDeleteTopic(topic._id)} className={styles.deleteBtn}>✕</button>
@@ -463,147 +508,158 @@ export default function TeacherDashboard() {
       {/* MODULES TAB */}
       {activeTab === 'modules' && (
         <div className={styles.content}>
-          <div className="glass-card" style={{ marginBottom: '2rem', border: '1px solid var(--primary)', background: 'rgba(99, 102, 241, 0.05)' }}>
-            <h3 style={{ marginBottom: '1rem', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <span>⚡</span> Magic 5E AI Generator
+          <div className="peak-card" style={{ 
+            background: 'linear-gradient(135deg, hsla(158, 94%, 30%, 0.1) 0%, hsla(199, 89%, 48%, 0.05) 100%)',
+            border: '2px solid var(--primary-light)',
+            padding: '3rem'
+          }}>
+            <h3 style={{ marginBottom: '1rem', color: 'var(--foreground)', display: 'flex', alignItems: 'center', gap: '1rem', fontSize: '2rem' }}>
+              <span style={{ fontSize: '2.5rem' }}>⚡</span> Magic 5E AI Architect
             </h3>
-            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '1rem' }}>
-              Paste a topic idea or syllabus snippet below to auto-construct a constructivist 5E lesson.
+            <p style={{ fontSize: '1.1rem', color: 'var(--text-muted)', marginBottom: '2.5rem', maxWidth: '800px' }}>
+              Our AI Pedagogical Expert will construct a complete 5E-compliant module based on your topic. This includes Nigerian context scenarios.
             </p>
-            <div style={{ display: 'flex', gap: '1rem' }}>
+            <div style={{ display: 'flex', gap: '1.5rem' }}>
               <input 
                 type="text" 
-                placeholder="e.g. Differentiation in Calculus or Binary Arithmetic" 
+                placeholder="Enter topic/syllabus snippet (e.g. Binary Logic Gates)..." 
                 value={aiInput}
                 onChange={(e) => setAiInput(e.target.value)}
-                className="input-base"
-                style={{ flex: 1, background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', padding: '0.8rem', borderRadius: '8px' }}
+                className={styles.input}
+                style={{ flex: 1, height: '60px', fontSize: '1.1rem' }}
               />
               <button 
                 onClick={handleAIGenerate}
                 disabled={isGenerating}
-                className="btn-primary"
-                style={{ background: 'var(--primary)', minWidth: '150px' }}
+                className="btn btn-primary"
+                style={{ minWidth: '220px', height: '60px', fontSize: '1.1rem' }}
               >
-                {isGenerating ? 'Constructing...' : 'Construct 5E ⚡'}
+                {isGenerating ? 'Architecting...' : 'Construct 5E ⚡'}
               </button>
             </div>
             
-            <div style={{ marginTop: '1rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-              <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>OR:</span>
+            <div style={{ marginTop: '2rem', display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+              <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>Rapid Selection:</span>
               <button 
-                 onClick={() => setAiInput('Extracted Syllabus: Data Processing Module 4 - Information Systems Evolution')} 
-                 className="btn-secondary" 
-                 style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem' }}
+                 onClick={() => setAiInput('Data Processing: Database Management Systems Evolution')} 
+                 className="btn btn-outline" 
+                 style={{ fontSize: '0.85rem', padding: '0.6rem 1.2rem' }}
               >
-                📁 Simulate Syllabus PDF Upload
+                📄 Import Syllabus Snippet
               </button>
             </div>
           </div>
 
-          <form onSubmit={handleAddModule} className={`glass-card ${styles.form}`}>
-            <h3>Add New Constructivist Module</h3>
+          <form onSubmit={handleAddModule} className={`peak-card ${styles.form}`}>
+            <h3><span style={{ color: 'var(--primary)' }}>🛠️</span> Module Constructor</h3>
             
             <div className={styles.formRow}>
-              <select
-                value={modTopicId}
-                onChange={(e) => setModTopicId(e.target.value)}
-                className={styles.select}
-                required
-                style={{ flex: 2 }}
-              >
-                <option value="">Select a Topic</option>
-                {topics.map((t) => (
-                  <option key={t._id} value={t._id}>{t.title}</option>
-                ))}
-              </select>
-              <select
-                value={modType}
-                onChange={(e) => setModType(e.target.value as 'lesson' | 'activity' | 'project')}
-                className={styles.select}
-                style={{ flex: 1 }}
-              >
-                <option value="lesson">📖 Lesson</option>
-                <option value="activity">🛠️ Activity</option>
-                <option value="project">🚀 Project</option>
-              </select>
+              <div style={{ flex: 2 }}>
+                <label className={styles.label}>Reference Topic</label>
+                <select
+                  value={modTopicId}
+                  onChange={(e) => setModTopicId(e.target.value)}
+                  className={styles.select}
+                  required
+                >
+                  <option value="">Select Topic</option>
+                  {topics.map((t) => (
+                    <option key={t._id} value={t._id}>{t.title}</option>
+                  ))}
+                </select>
+              </div>
+              <div style={{ flex: 1 }}>
+                <label className={styles.label}>Module Type</label>
+                <select
+                  value={modType}
+                  onChange={(e) => setModType(e.target.value as 'lesson' | 'activity' | 'project')}
+                  className={styles.select}
+                >
+                  <option value="lesson">📖 Lesson</option>
+                  <option value="activity">🛠️ Activity</option>
+                  <option value="project">🚀 Project</option>
+                </select>
+              </div>
             </div>
 
-            <input
-              type="text"
-              placeholder="Module title"
-              value={modTitle}
-              onChange={(e) => setModTitle(e.target.value)}
-              className={styles.input}
-              required
-            />
+            <div>
+              <label className={styles.label}>Module Title</label>
+              <input
+                type="text"
+                placeholder="Display title for the student"
+                value={modTitle}
+                onChange={(e) => setModTitle(e.target.value)}
+                className={styles.input}
+                required
+              />
+            </div>
             
-            <textarea
-              placeholder="Brief introduction or overview content for this module..."
-              value={modContent}
-              onChange={(e) => setModContent(e.target.value)}
-              className={styles.textarea}
-              required
-            />
+            <div>
+              <label className={styles.label}>Foundation Overview</label>
+              <textarea
+                placeholder="Initial narrative or conceptual introduction..."
+                value={modContent}
+                onChange={(e) => setModContent(e.target.value)}
+                className={styles.textarea}
+                required
+              />
+            </div>
 
             <div className={styles.label}>
               Step 1: Engage (The Hook)
               <div className={styles.tooltipContainer}>
-                <span className={styles.infoIcon}>?</span>
-                <span className={styles.tooltipText}>Create a puzzle or question to activate prior knowledge and create curiosity.</span>
+                <div className={styles.infoIcon}>?</div>
+                <div className={styles.tooltipText}>Spark curiosity with a visual aid, puzzle, or provocative question that relates to the student&apos;s background.</div>
               </div>
             </div>
             <textarea
-              placeholder="e.g., Project a complex curve. Ask: 'What is the slope exactly at this single point?'"
+              placeholder="e.g., Show a picture of a crowded market. Ask: 'How can we track 500 different sales instantly?'"
               value={modEngage}
               onChange={(e) => setModEngage(e.target.value)}
               className={styles.textarea}
             />
 
             <div className={styles.label}>
-              Step 2: Explore (Hands-on Investigation)
+              Step 2: Explore (Discovery)
               <div className={styles.tooltipContainer}>
-                <span className={styles.infoIcon}>?</span>
-                <span className={styles.tooltipText}>Provide a task where students experiment or manipulate concepts before being told the rules.</span>
+                <div className={styles.infoIcon}>?</div>
+                <div className={styles.tooltipText}>Hands-on activity. Let students play with data or tools before explaining the theory.</div>
               </div>
             </div>
             <textarea
-              placeholder="e.g., Use Desmos to pick two points and move them closer and closer together. Observe the slope."
+              placeholder="e.g., Provide a raw table of data and ask students to find the highest spender manually."
               value={modExplore}
               onChange={(e) => setModExplore(e.target.value)}
               className={styles.textarea}
             />
 
             <div className={styles.label}>
-              Step 3: Explain (Formal Concept)
+              Step 3: Explain (Mental Model)
               <div className={styles.tooltipContainer}>
-                <span className={styles.infoIcon}>?</span>
-                <span className={styles.tooltipText}>Now introduce the formal definitions and formulas based on their exploration.</span>
+                <div className={styles.infoIcon}>?</div>
+                <div className={styles.tooltipText}>Bridge the gap between their discovery and formal ICT concepts/definitions.</div>
               </div>
             </div>
             <textarea
-              placeholder="e.g., Introduce the limit definition of the derivative: f'(x) = lim h->0 ..."
+              placeholder="e.g., Introduce SQL SELECT statements and how they automate their manual search process."
               value={modExplain}
               onChange={(e) => setModExplain(e.target.value)}
               className={styles.textarea}
             />
 
-            <div className={styles.label}>Step 4: Elaborate (Adaptive Extensions)</div>
-            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-              How does this apply to different real-world roles? (Inherited from Subject)
-            </p>
+            <div className={styles.label}>Step 4: Elaborate (Real-world Scaffolding)</div>
             <div className={styles.contextGroup}>
               {currentModuleContexts.length === 0 ? (
-                <p style={{ fontSize: '0.85rem', color: 'var(--accent)' }}>
-                  ⚠️ No contexts defined for this subject. Add them in the Subjects tab to enable adaptive content.
+                <p style={{ color: 'var(--accent)', fontWeight: 700 }}>
+                  ⚠️ No roles defined for this subject. Please add &apos;Adaptive Contexts&apos; in the Subjects tab.
                 </p>
               ) : (
                 currentModuleContexts.map((opt) => (
-                  <div key={opt} style={{ marginTop: '1rem' }}>
-                    <p style={{ fontSize: '0.85rem', fontWeight: 600 }}>Applied Scenario for: {opt}</p>
+                  <div key={opt} style={{ marginBottom: '2.5rem' }}>
+                    <p style={{ fontSize: '1rem', fontWeight: 800, marginBottom: '1rem', color: 'var(--primary)' }}>Scenario for: {opt}</p>
                     <textarea
                       className={styles.textarea}
-                      placeholder={`Explain how this concept applies specifically to a ${opt}`}
+                      placeholder={`Adapt the learning for a student working as a ${opt}...`}
                       value={modElaborate[opt] || ''}
                       onChange={(e) =>
                         setModElaborate({ ...modElaborate, [opt]: e.target.value })
@@ -614,41 +670,43 @@ export default function TeacherDashboard() {
               )}
             </div>
 
-            <div className={styles.label}>
-              Step 5: Evaluate (Assessment & Reflection)
+            <div className={styles.label} style={{ marginTop: '2rem' }}>
+              Step 5: Evaluate (Mastery Check)
               <div className={styles.tooltipContainer}>
-                <span className={styles.infoIcon}>?</span>
-                <span className={styles.tooltipText}>Assess mastery through reflections, quizzes, or exit tickets.</span>
+                <div className={styles.infoIcon}>?</div>
+                <div className={styles.tooltipText}>Formative assessment. Exit tickets, reflections, or practical challenges.</div>
               </div>
             </div>
             <textarea
-              placeholder="e.g., Write a 'Letter to a Friend' explaining what a derivative actually represents."
+              placeholder="e.g., Student must write a query to solve a new logistics problem for a local delivery business."
               value={modEvaluate}
               onChange={(e) => setModEvaluate(e.target.value)}
               className={styles.textarea}
             />
 
-            <button type="submit" className="btn btn-primary" style={{ marginTop: '2rem' }}>Publish 5E Module</button>
+            <button type="submit" className="btn btn-primary" style={{ marginTop: '3rem', alignSelf: 'flex-start', padding: '1rem 3rem' }}>
+              Publish Module to Network
+            </button>
           </form>
 
           <div className={styles.list}>
             {modules.length === 0 ? (
-              <div className="glass-card" style={{ textAlign: 'center', color: 'var(--text-muted)' }}>
-                <p>No modules yet. Create your first module above!</p>
+              <div className="peak-card" style={{ textAlign: 'center', color: 'var(--text-muted)', gridColumn: '1 / -1' }}>
+                <p>System offline. No active modules found in this sector.</p>
               </div>
             ) : (
               modules.map((mod) => (
-                <div key={mod._id} className={`glass-card ${styles.card}`}>
+                <div key={mod._id} className={`peak-card ${styles.card}`}>
                   <div className={styles.cardHeader}>
                     <div>
-                      <h4>{mod.title}</h4>
+                      <h4 style={{ fontSize: '1.5rem', marginBottom: '0.75rem' }}>{mod.title}</h4>
                       <span className={styles.typeBadge} data-type={mod.type}>
                         {mod.type === 'lesson' ? '📖' : mod.type === 'activity' ? '🛠️' : '🚀'} {mod.type}
                       </span>
                     </div>
                     <button onClick={() => handleDeleteModule(mod._id)} className={styles.deleteBtn}>✕</button>
                   </div>
-                  <p className={styles.cardDesc}>{mod.content}</p>
+                  <p className={styles.cardDesc}>{mod.content.substring(0, 150)}...</p>
                 </div>
               ))
             )}
