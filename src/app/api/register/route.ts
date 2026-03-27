@@ -22,7 +22,7 @@ export async function POST(req: Request) {
     const passwordHash = await bcrypt.hash(password, 12);
     const verificationToken = crypto.randomBytes(32).toString('hex');
 
-    await User.create({ 
+    const newUser = await User.create({ 
       name, 
       email, 
       passwordHash, 
@@ -32,19 +32,25 @@ export async function POST(req: Request) {
     });
 
     // Send verification email
-    const emailRes = await sendVerificationEmail(email, verificationToken, name);
-    
-    if (!emailRes.success) {
-      console.error('Email sending failed, but user created:', emailRes.error);
-      // We still return success but maybe a warning in logs
+    try {
+      const emailRes = await sendVerificationEmail(email, verificationToken, name);
+      if (!emailRes.success) {
+        console.warn('Registration: Email dispatch failed for:', email);
+      }
+    } catch (emailErr) {
+      console.error('Registration: Critical email dispatch error:', emailErr);
     }
 
     return NextResponse.json({ 
       success: true, 
-      message: 'Registration successful. Please verify your email.' 
+      message: 'Account constructed successfully. Dispatched verification protocol.',
+      data: { id: newUser._id, email: newUser.email }
     });
   } catch (error) {
-    console.error('Registration Error:', error);
-    return NextResponse.json({ success: false, error: (error as Error).message }, { status: 500 });
+    console.error('[API] Registration Critical Failure:', error);
+    return NextResponse.json({ 
+      success: false, 
+      error: 'Platform sterilization interrupted. Internal registry failure.' 
+    }, { status: 500 });
   }
 }

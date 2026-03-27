@@ -1,5 +1,5 @@
 async function testAI() {
-  const response = await fetch('http://localhost:3000/api/ai/generate-module', {
+  const response = await fetch('https://ict-learner-ng.vercel.app/api/ai/generate-module', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({

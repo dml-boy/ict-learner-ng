@@ -10,9 +10,10 @@ export async function GET(request: NextRequest) {
     const topicId = searchParams.get('topicId');
     const filter = topicId ? { topicId } : {};
     const modules = await Module.find(filter).populate('topicId', 'title').sort({ createdAt: -1 });
-    return NextResponse.json({ success: true, data: modules });
+    return NextResponse.json({ success: true, count: modules.length, data: modules });
   } catch (error) {
-    return NextResponse.json({ success: false, error: (error as Error).message }, { status: 500 });
+    console.error('[API] Modules Fetch Failure:', error);
+    return NextResponse.json({ success: false, error: 'Module registry unavailable.' }, { status: 500 });
   }
 }
 
@@ -22,8 +23,9 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const moduleDoc = await Module.create(body);
-    return NextResponse.json({ success: true, data: moduleDoc }, { status: 201 });
+    return NextResponse.json({ success: true, message: 'Pedagogical module constructed.', data: moduleDoc }, { status: 201 });
   } catch (error) {
+    console.error('[API] Module Creation Failure:', error);
     return NextResponse.json({ success: false, error: (error as Error).message }, { status: 400 });
   }
 }

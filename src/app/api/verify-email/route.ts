@@ -16,6 +16,7 @@ export async function GET(req: Request) {
     const user = await User.findOne({ verificationToken: token });
 
     if (!user) {
+      console.warn('Verification: Attempt with invalid token:', token);
       return NextResponse.redirect(new URL('/login?error=invalid_token', req.url));
     }
 
@@ -23,9 +24,10 @@ export async function GET(req: Request) {
     user.verificationToken = undefined;
     await user.save();
 
+    console.info('Verification: Identity confirmed for:', user.email);
     return NextResponse.redirect(new URL('/login?verified=true', req.url));
   } catch (error) {
-    console.error('Verification Error:', error);
+    console.error('[API] Verification Critical Failure:', error);
     return NextResponse.redirect(new URL('/login?error=server_error', req.url));
   }
 }

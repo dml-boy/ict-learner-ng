@@ -1,15 +1,44 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
+import { useEffect } from 'react';
 import Sidebar from './Sidebar';
 import Navbar from './Navbar';
 import Providers from './Providers';
 
 export default function LayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+
+  useEffect(() => {
+    // Global Scroll Reveal Observer
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('reveal-visible');
+        }
+      });
+    }, { threshold: 0.1 });
+
+    const observerTarget = () => {
+      document.querySelectorAll('.reveal-up').forEach(el => observer.observe(el));
+    };
+
+    observerTarget();
+    
+    // Re-run on pathname change to catch new elements
+    const timeoutId = setTimeout(observerTarget, 100);
+
+    return () => {
+      observer.disconnect();
+      clearTimeout(timeoutId);
+    };
+  }, [pathname]);
   
   // Public routes that don't need sidebar/navbar
   const isPublicRoute = pathname === '/' || 
+                        pathname.startsWith('/about') || 
+                        pathname.startsWith('/contact') || 
+                        pathname.startsWith('/courses') || 
                         pathname.startsWith('/login') || 
                         pathname.startsWith('/register') || 
                         pathname.startsWith('/verify-email');

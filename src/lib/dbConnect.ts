@@ -12,7 +12,6 @@ interface MongooseCache {
 }
 
 declare global {
-  // eslint-disable-next-line no-var
   var mongooseCache: MongooseCache | undefined;
 }
 
@@ -28,10 +27,27 @@ async function dbConnect(): Promise<typeof mongoose> {
   }
 
   if (!cached.promise) {
-    cached.promise = mongoose.connect(MONGODB_URI as string).then((mongoose) => mongoose);
+    const opts = {
+      bufferCommands: false,
+      connectTimeoutMS: 10000,
+      socketTimeoutMS: 45000,
+      family: 4, // Force IPv4 — avoids SRV AAAA lookup failures on restricted networks
+    };
+    cached.promise = mongoose.connect(MONGODB_URI as string, opts)
+      .then((mongooseInstance) => mongooseInstance)
+      .catch((err) => {
+        // Clear promise on failure so the next request retries
+        cached.promise = null;
+        throw err;
+      });
   }
 
-  cached.conn = await cached.promise;
+  try {
+    cached.conn = await cached.promise;
+  } catch (err) {
+    cached.promise = null;
+    throw err;
+  }
   return cached.conn;
 }
 

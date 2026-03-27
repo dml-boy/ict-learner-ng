@@ -11,9 +11,10 @@ export async function GET(request: NextRequest) {
     const filter = subjectId ? { subjectId } : {};
     
     const topics = await Topic.find(filter).sort({ createdAt: -1 });
-    return NextResponse.json({ success: true, data: topics });
+    return NextResponse.json({ success: true, count: topics.length, data: topics });
   } catch (error) {
-    return NextResponse.json({ success: false, error: (error as Error).message }, { status: 500 });
+    console.error('[API] Topics Fetch Failure:', error);
+    return NextResponse.json({ success: false, error: 'Database synchronization interrupted.' }, { status: 500 });
   }
 }
 
@@ -23,8 +24,9 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const topic = await Topic.create(body);
-    return NextResponse.json({ success: true, data: topic }, { status: 201 });
+    return NextResponse.json({ success: true, message: 'New ICT Topic cataloged.', data: topic }, { status: 201 });
   } catch (error) {
+    console.error('[API] Topic Creation Failure:', error);
     return NextResponse.json({ success: false, error: (error as Error).message }, { status: 400 });
   }
 }

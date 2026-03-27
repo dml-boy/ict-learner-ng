@@ -194,6 +194,11 @@ export default function IntroPage({ params }: { params: Promise<{ id: string }> 
           </div>
 
           <div style={{ fontSize: '1.2rem', lineHeight: '1.8', whiteSpace: 'pre-wrap', color: '#334155' }}>
+            {currentStep === 2 && (
+              <p style={{ fontWeight: 800, color: 'var(--primary)', marginBottom: '1.5rem', borderBottom: '2px solid var(--primary-glow)', paddingBottom: '0.5rem', width: 'fit-content' }}>
+                At the end of this lesson student should be able to:
+              </p>
+            )}
             {steps[currentStep].content}
           </div>
 

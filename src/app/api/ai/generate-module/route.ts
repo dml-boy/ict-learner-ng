@@ -42,21 +42,31 @@ export async function POST(req: Request) {
     const response = await result.response;
     let text = response.text();
     
-    // Clean JSON if the AI includes markdown wrappers
-    if (text.includes('```json')) {
-      text = text.split('```json')[1].split('```')[0].trim();
-    } else if (text.includes('```')) {
-      text = text.split('```')[1].split('```')[0].trim();
+    // Improved JSON Sanctuary cleaning
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      text = jsonMatch[0];
     }
 
-    const data = JSON.parse(text);
-
-    return NextResponse.json({ success: true, data });
+    try {
+      const data = JSON.parse(text);
+      return NextResponse.json({ 
+        success: true, 
+        message: 'High-fidelity pedagogical module synthesized by Gemini.',
+        data 
+      });
+    } catch (parseErr) {
+      console.error('[API] AI Generation Parsing Failure:', parseErr, text);
+      return NextResponse.json({ 
+        success: false, 
+        error: 'Synthesis failure. Neural engine returned non-compliant structure.' 
+      }, { status: 500 });
+    }
   } catch (error) {
-    console.error('Gemini API Error:', error);
+    console.error('[API] Gemini Neural Engine Error:', error);
     return NextResponse.json({ 
       success: false, 
-      error: 'Failed to generate 5E module using Gemini. Check your API key or quota.' 
+      error: 'Cognitive synthesis interrupted. AI Engine currently unreachable.' 
     }, { status: 500 });
   }
 }

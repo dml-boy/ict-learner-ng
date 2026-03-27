@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
+import AuthCard from '@/components/AuthCard';
 
 export default function StudentRegister() {
   const [name, setName] = useState('');
@@ -39,99 +39,94 @@ export default function StudentRegister() {
 
   if (success) {
     return (
-      <div className="auth-container">
-        <div className="glass-card animate-in" style={{ maxWidth: '480px', textAlign: 'center' }}>
-          <div style={{ fontSize: '4rem', marginBottom: '1.5rem' }}>📧</div>
-          <h2 style={{ marginBottom: '1rem' }}>Verify Your Email</h2>
-          <p style={{ color: 'var(--text-muted)', marginBottom: '2rem', fontSize: '1rem', fontWeight: 500 }}>
-            We&apos;ve sent a verification link to <strong>{email}</strong>. <br />
-            Please check your inbox to activate your student account.
-          </p>
-          <Link href="/login" className="btn btn-primary" style={{ width: '100%' }}>
-            Go to Login
+      <AuthCard 
+        headerTitle="Access Granted" 
+        headerSubtitle="Verification Initiated"
+        isSuccess={true}
+        footerContent={
+          <Link href="/login" className="btn btn-primary w-full py-4 text-lg">
+            Return to Gateway
           </Link>
+        }
+      >
+        <div className="text-center py-6">
+          <div className="text-6xl mb-10 animate-float">🚀</div>
+          <h2 className="gradient-text text-3xl font-black mb-6">Credential Dispatch</h2>
+          <p className="text-slate-500 font-medium leading-relaxed px-4">
+            A secure verification link has been sent to <strong>{email}</strong>. <br />
+            Activate your profile to begin your ICT mastery journey.
+          </p>
         </div>
-      </div>
+      </AuthCard>
     );
   }
 
   return (
-    <div className="auth-container">
-      <div className="glass-card animate-in" style={{ width: '100%', maxWidth: '440px' }}>
-        <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
-            <Image src="/logosm.svg" alt="ICT Learner NG" width={50} height={46} />
+    <AuthCard 
+      headerTitle="Student Portal" 
+      headerSubtitle="Construct Your Digital Future"
+      footerContent={
+        <div className="text-slate-500 font-medium text-center">
+          Already part of the network? <Link href="/login" className="auth-link">Sign In</Link> <br />
+          <div className="mt-6 pt-4 border-t border-slate-50">
+             <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Sector Specialist?</span> <br />
+             <Link href="/register/teacher" className="text-emerald-600 font-black hover:text-[#044331] no-underline">Access Educator Gateway</Link>
           </div>
-          <h2 style={{ fontSize: '1.8rem', fontWeight: 900, color: '#044331', marginBottom: '0.5rem', letterSpacing: '-0.3px' }}>Student Registration</h2>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', fontWeight: 500 }}>Start your journey as an ICT learner</p>
+        </div>
+      }
+    >
+      <form onSubmit={handleSubmit} className="auth-form">
+        <div>
+          <label className="auth-label">Full Name</label>
+          <input 
+            type="text" 
+            className="input" 
+            placeholder="Adebayo Ogunlesi" 
+            required 
+            autoComplete="name"
+            value={name}
+            onChange={e => setName(e.target.value)}
+          />
+        </div>
+        <div>
+          <label className="auth-label">Personal Email</label>
+          <input 
+            type="email" 
+            className="input" 
+            placeholder="student@domain.edu.ng" 
+            required 
+            autoComplete="email"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+          />
+        </div>
+        <div>
+          <label className="auth-label">Security Password</label>
+          <input 
+            type="password" 
+            className="input" 
+            placeholder="••••••••" 
+            required 
+            autoComplete="new-password"
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+          />
         </div>
 
-        <form onSubmit={handleSubmit}>
-          <div className="input-group">
-            <label className="label">Full Name</label>
-            <input 
-              type="text" 
-              className="input" 
-              placeholder="Adebayo Ogunlesi" 
-              required 
-              value={name}
-              onChange={e => setName(e.target.value)}
-            />
+        {error && (
+          <div className="auth-message auth-message-error mb-4">
+            {error}
           </div>
-          <div className="input-group">
-            <label className="label">Email Address</label>
-            <input 
-              type="email" 
-              className="input" 
-              placeholder="student@example.ng" 
-              required 
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-            />
-          </div>
-          <div className="input-group">
-            <label className="label">Password</label>
-            <input 
-              type="password" 
-              className="input" 
-              placeholder="••••••••" 
-              required 
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-            />
-          </div>
+        )}
 
-          {error && (
-            <div style={{ 
-              padding: '1rem', 
-              background: '#fef2f2', 
-              border: '1px solid #ef4444',
-              borderRadius: 'var(--radius-sm)',
-              color: '#991b1b',
-              fontSize: '0.875rem',
-              marginBottom: '1.5rem',
-              textAlign: 'center',
-              fontWeight: 500
-            }}>
-              {error}
-            </div>
-          )}
-
-          <button type="submit" className="btn btn-primary" style={{ width: '100%', marginBottom: '1.5rem' }} disabled={loading}>
-            {loading ? 'Creating account...' : 'Create Student Account'}
-          </button>
-        </form>
-
-        <p style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-          Already have an account? <Link href="/login" style={{ color: 'var(--primary)', fontWeight: 700, textDecoration: 'none' }}>Sign In</Link>
-        </p>
-
-        <div style={{ marginTop: '2.5rem', paddingTop: '1.5rem', borderTop: '1px solid var(--card-border)', textAlign: 'center' }}>
-          <p style={{ fontSize: '0.85rem', color: '#64748b' }}>
-            Registering as a teacher? <Link href="/register/teacher" style={{ color: 'var(--primary)', fontWeight: 600, textDecoration: 'none' }}>Click here</Link>
-          </p>
-        </div>
-      </div>
-    </div>
+        <button 
+          type="submit" 
+          className="btn btn-primary w-full py-4 text-lg mt-4" 
+          disabled={loading}
+        >
+          {loading ? 'Initializing...' : 'Construct Account'}
+        </button>
+      </form>
+    </AuthCard>
   );
 }
