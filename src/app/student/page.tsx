@@ -4,19 +4,11 @@ import { useRouter } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
 import LiveEditor from '@/components/LiveEditor';
 import Image from 'next/image';
-interface Module {
-  _id: string;
-  title: string;
-  content: string;
-  topicId: { _id: string; title: string } | string;
-  type: 'lesson' | 'activity' | 'project';
-  constructivistNote: string;
-  createdAt: string;
-}
+import { Module, StudentProgress } from '@/types';
 
 export default function StudentDashboard() {
   const [modules, setModules] = useState<Module[]>([]);
-  const [progress, setProgress] = useState<{ moduleId: string; status: string }[]>([]);
+  const [progress, setProgress] = useState<StudentProgress[]>([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const { data: session } = useSession();
@@ -25,6 +17,7 @@ export default function StudentDashboard() {
 
   useEffect(() => {
     if (userId === 'guest') return;
+    setLoading(true);
     Promise.all([
       fetch('/api/modules').then((res) => res.json()),
       fetch(`/api/progress?userId=${userId}`).then((res) => res.json())
@@ -32,230 +25,157 @@ export default function StudentDashboard() {
       .then(([modulesData, progressData]) => {
         if (modulesData.success) setModules(modulesData.data);
         if (progressData.success) setProgress(progressData.data);
-        setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch((err) => {
+        console.error('[Student Dashboard] Neural uplink failure:', err);
+      })
+      .finally(() => setLoading(false));
   }, [userId]);
 
   const getModuleStatus = (moduleId: string) => {
     const prog = progress.find((p) => {
-      const mid = p.moduleId as unknown;
-      return typeof mid === 'string' ? mid === moduleId : (mid as { _id: string })._id === moduleId;
+      const mid = p.moduleId;
+      return typeof mid === 'string' ? mid === moduleId : (mid as Module)?._id === moduleId;
     });
-    if (prog) return prog.status;
-    
-    // First module is always unlocked (in-progress)
-    if (modules.length > 0 && modules[modules.length - 1]._id === moduleId) {
-      return 'unlocked';
-    }
-    return 'locked';
+    return prog?.status || 'available';
   };
 
   return (
-    <div className="animate-fade-in" style={{ paddingBottom: '5rem' }}>
+    <div className="animate-fade-in pb-20">
       {/* Hero Section */}
-      <section style={{ 
-        textAlign: 'center', 
-        padding: '5rem 1rem', 
-        marginBottom: '4rem',
-        position: 'relative',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        background: 'radial-gradient(circle at center, var(--primary-glow) 0%, transparent 70%)'
-      }}>
-        <div className="animate-float" style={{ 
-          fontSize: '4rem', 
-          marginBottom: '2rem',
-          background: 'rgba(255, 255, 255, 0.8)',
-          backdropFilter: 'blur(10px)',
-          width: '120px',
-          height: '120px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          borderRadius: '30% 70% 70% 30% / 30% 30% 70% 70%',
-          boxShadow: '0 20px 40px var(--primary-glow)',
-          border: '1px solid var(--card-border)'
-        }}>
-          <Image src="/logosm.svg" alt="ICT Learner NG" width={60} height={56} />
+      <section className="relative flex flex-col items-center justify-center text-center py-24 mb-16 px-4 bg-[radial-gradient(circle_at_center,var(--primary-glow)_0%,transparent_70%)] overflow-hidden">
+        <div className="animate-float mb-8 w-28 h-28 flex items-center justify-center bg-white/80 backdrop-blur-xl rounded-[30%_70%_70%_30%_/_30%_30%_70%_70%] shadow-[0_20px_40px_var(--primary-glow)] border border-card-border overflow-hidden">
+          <Image src="/logosm.svg" alt="ICT Learner NG" width={70} height={65} priority />
         </div>
-        <h1 className="gradient-text" style={{ fontSize: '5rem', marginBottom: '1.5rem', lineHeight: '1', fontWeight: 900 }}>
+        <h1 className="gradient-text text-5xl md:text-7xl mb-6 font-black leading-tight tracking-tight">
           Welcome, {userName}
         </h1>
-        <p style={{ 
-          color: 'var(--text-muted)', 
-          fontSize: '1.35rem', 
-          maxWidth: '700px',
-          fontFamily: 'var(--font-main)',
-          fontWeight: 500,
-          lineHeight: '1.6'
-        }}>
+        <p className="text-text-muted text-lg md:text-xl max-w-2xl font-medium leading-relaxed mb-10">
           Step into your personalized constructivist learning environment. Forge your ICT expertise through active exploration and discovery.
         </p>
-        <div style={{ display: 'flex', gap: '1rem', marginTop: '2.5rem' }}>
-          <button onClick={() => router.push('/student/modules')} className="btn btn-primary">
-            Explore Modules
+        <div className="flex flex-wrap justify-center gap-4">
+          <button onClick={() => router.push('/student/modules')} className="btn btn-primary px-10 py-4 shadow-[0_10px_20px_var(--primary-glow)] group">
+            Browse Courses <span className="inline-block transition-transform group-hover:translate-x-1">→</span>
           </button>
-          <button onClick={() => signOut({ callbackUrl: '/login' })} className="btn btn-outline">
+          <button onClick={() => signOut({ callbackUrl: '/login' })} className="btn btn-outline px-10 py-4">
             Sign Out
           </button>
         </div>
       </section>
 
       {/* Progress Overview */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '2rem', marginBottom: '5rem' }}>
-        <div className="peak-card" style={{ textAlign: 'center' }}>
-          <h5 style={{ color: 'var(--text-muted)', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.75rem' }}>Modules Available</h5>
-          <div style={{ fontSize: '3rem', fontWeight: 900, color: 'var(--foreground)' }}>{modules.length}</div>
-          <div style={{ fontSize: '0.8rem', color: 'var(--primary)', fontWeight: 600, marginTop: '0.5rem' }}>Global Curriculum</div>
+      <div className="stat-grid mb-20 px-4">
+        <div className="peak-card text-center group translate-y-0 hover:-translate-y-2 transition-all duration-300">
+          <h5 className="text-[0.75rem] text-text-muted uppercase tracking-widest font-black mb-3">Courses Available</h5>
+          <div className="text-5xl font-black text-foreground mb-2">{modules.length}</div>
+          <div className="text-[0.65rem] text-primary font-bold uppercase tracking-wider bg-primary/10 py-1 px-3 rounded-full inline-block">Global Curriculum</div>
         </div>
-        <div className="peak-card" style={{ textAlign: 'center' }}>
-          <h5 style={{ color: 'var(--text-muted)', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.75rem' }}>Mastered</h5>
-          <div style={{ fontSize: '3rem', fontWeight: 900, color: 'var(--secondary)' }}>
+        <div className="peak-card text-center group translate-y-0 hover:-translate-y-2 transition-all duration-300">
+          <h5 className="text-[0.75rem] text-text-muted uppercase tracking-widest font-black mb-3">Mastered</h5>
+          <div className="text-5xl font-black text-secondary mb-2">
             {progress.filter(p => p.status === 'completed').length}
           </div>
-          <div style={{ fontSize: '0.8rem', color: 'var(--secondary)', fontWeight: 600, marginTop: '0.5rem' }}>Achievement Unlocked</div>
+          <div className="text-[0.65rem] text-secondary font-bold uppercase tracking-wider bg-secondary/10 py-1 px-3 rounded-full inline-block">Achievement Unlocked</div>
         </div>
-        <div className="peak-card" style={{ textAlign: 'center' }}>
-          <h5 style={{ color: 'var(--text-muted)', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.75rem' }}>In Progress</h5>
-          <div style={{ fontSize: '3rem', fontWeight: 900, color: 'var(--primary-light)' }}>
+        <div className="peak-card text-center group translate-y-0 hover:-translate-y-2 transition-all duration-300">
+          <h5 className="text-[0.75rem] text-text-muted uppercase tracking-widest font-black mb-3">In Progress</h5>
+          <div className="text-5xl font-black text-primary-light mb-2">
             {modules.length - progress.filter(p => p.status === 'completed').length}
           </div>
-          <div style={{ fontSize: '0.8rem', color: 'var(--primary-light)', fontWeight: 600, marginTop: '0.5rem' }}>Active Evolution</div>
+          <div className="text-[0.65rem] text-primary-light font-bold uppercase tracking-wider bg-primary-light/10 py-1 px-3 rounded-full inline-block">Active Evolution</div>
         </div>
       </div>
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '3rem' }}>
+      <div className="flex flex-col md:flex-row justify-between items-center md:items-end mb-12 px-6 gap-6">
         <div>
-          <h3 style={{ fontSize: '2.5rem', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <span style={{ color: 'var(--primary)' }}>✦</span> Learning Path
+          <h3 className="text-3xl md:text-4xl font-black mb-2 flex items-center gap-3">
+            <span className="text-primary animate-pulse">✦</span> My Course Catalog
           </h3>
-          <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>Sequential modules designed for cognitive scaffolding.</p>
+          <p className="text-text-muted text-base md:text-lg">Constructivist courses scaffolded for your cognitive growth.</p>
         </div>
-        <div className="tag-nigeria" style={{ padding: '0.6rem 1.5rem', fontSize: '0.8rem' }}>
-          NIGERIA ICT CURRICULUM v2.0
+        <div className="tag-nigeria px-6 py-2.5 text-[0.75rem] font-black border-2">
+          NIGERIA ICT CURRICULUM v2.5
         </div>
       </div>
 
       {/* Module List */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(380px, 1fr))', gap: '3rem' }}>
+      <div className="dashboard-grid px-6">
         {loading ? (
-          <div className="peak-card" style={{ textAlign: 'center', color: 'var(--text-muted)', gridColumn: '1 / -1' }}>
-            <div className="animate-pulse" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
-              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '3px solid var(--primary-glow)', borderTopColor: 'var(--primary)', animation: 'spin 1s linear infinite' }}></div>
-              <p>Calibrating your learning universe...</p>
-            </div>
+          <div className="peak-card text-center text-text-muted col-span-full py-20 flex flex-col items-center justify-center gap-6">
+            <div className="w-12 h-12 rounded-full border-4 border-primary-glow border-t-primary animate-spin"></div>
+            <p className="font-extrabold tracking-widest uppercase text-xs">Calibrating your learning universe...</p>
           </div>
         ) : modules.length > 0 ? (
           modules.map((mod) => {
             const status = getModuleStatus(mod._id);
-            const isLocked = status === 'locked';
             const isCompleted = status === 'completed';
+            const isInProgress = status === 'in-progress';
 
             return (
               <div 
                 key={mod._id} 
-                className="peak-card" 
-                style={{ 
-                  cursor: isLocked ? 'not-allowed' : 'pointer',
-                  opacity: isLocked ? 0.6 : 1,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  padding: '2.5rem'
-                }} 
-                onClick={() => !isLocked && router.push(`/student/learn/${mod._id}/intro`)}
+                className="peak-card flex flex-col p-8 group translate-y-0 hover:-translate-y-3 hover:shadow-[0_20px_50px_rgba(0,0,0,0.1)] transition-all duration-500 cursor-pointer border-t-2 border-transparent hover:border-primary-glow"
+                onClick={() => router.push(`/student/learn/${mod._id}/intro`)}
               >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2rem' }}>
-                  <div className="tag-nigeria" style={{ fontSize: '0.7rem' }}>
-                    {typeof mod.topicId === 'object' ? mod.topicId.title : 'ICT CORE'}
+                <div className="flex justify-between items-start mb-8">
+                  <div className="tag-nigeria text-[0.65rem] font-black uppercase tracking-tighter bg-foreground/5 text-foreground border-transparent">
+                    {typeof mod.topicId === 'object' ? mod.topicId.title : 'ICT CORE INFRA'}
                   </div>
-                  <div style={{ 
-                    fontSize: '1.5rem', 
-                    background: isLocked ? 'var(--background)' : 'var(--primary-glow)',
-                    width: '44px',
-                    height: '44px',
-                    borderRadius: '12px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}>
-                    {isCompleted ? '✅' : (isLocked ? '🔒' : '🚀')}
+                  <div className={`text-xl w-12 h-12 flex items-center justify-center rounded-2xl shadow-sm transition-all duration-300 ${isCompleted ? 'bg-secondary/10 shadow-secondary/20' : 'bg-primary-glow shadow-primary-glow/20'}`}>
+                    {isCompleted ? '🛡️' : isInProgress ? '⚡' : '🔮'}
                   </div>
                 </div>
                 
-                <h4 style={{ fontSize: '1.75rem', marginBottom: '1.25rem', color: isLocked ? 'var(--text-muted)' : 'var(--foreground)' }}>
+                <h4 className="text-2xl font-black mb-4 text-foreground group-hover:text-primary transition-colors leading-tight">
                   {mod.title}
                 </h4>
                 
-                <p style={{ 
-                  fontSize: '1rem', 
-                  color: 'var(--text-muted)', 
-                  marginBottom: '2.5rem', 
-                  minHeight: '4.5rem',
-                  lineHeight: '1.6'
-                }}>
-                  {mod.content.substring(0, 140)}{mod.content.length > 140 ? '...' : ''}
+                <p className="text-sm text-text-muted mb-8 italic leading-relaxed flex-1 opacity-80 group-hover:opacity-100 transition-opacity">
+                  &quot;{mod.content.substring(0, 140)}{mod.content.length > 140 ? '...' : ''}&quot;
                 </p>
                 
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto', paddingTop: '2rem', borderTop: '1px solid var(--card-border)' }}>
-                  <div style={{ display: 'flex', flexDirection: 'column' }}>
-                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Status</span>
-                    <span style={{ 
-                      fontSize: '1rem', 
-                      fontWeight: 800, 
-                      color: isCompleted ? 'var(--secondary)' : (isLocked ? 'var(--text-muted)' : 'var(--primary)')
-                    }}>
-                      {isCompleted ? 'Mastered' : (isLocked ? 'Encrypted' : 'Available')}
+                <div className="flex justify-between items-center mt-auto pt-6 border-t border-border/50">
+                  <div className="flex flex-col">
+                    <span className="text-[0.6rem] text-text-muted uppercase font-black tracking-widest mb-1">Sector Status</span>
+                    <span className={`text-[0.9rem] font-extrabold ${isCompleted ? 'text-secondary' : isInProgress ? 'text-primary' : 'text-text-muted opacity-50'}`}>
+                      {isCompleted ? 'MASTERY ACHIEVED' : isInProgress ? 'ACTIVE UPLINK' : 'READY FOR INIT'}
                     </span>
                   </div>
                   <button 
-                    disabled={isLocked}
-                    className={isCompleted ? "btn btn-outline" : "btn btn-primary"} 
-                    style={{ 
-                      fontSize: '0.9rem', 
-                      padding: '0.75rem 1.5rem',
-                    }}
+                    className={`btn text-[0.8rem] px-5 py-2.5 border-2 ${isCompleted ? 'btn-outline border-secondary/20 text-secondary' : 'btn-primary shadow-lg border-transparent'}`}
+                    onClick={e => { e.stopPropagation(); router.push(`/student/learn/${mod._id}/intro`); }}
                   >
-                    {isCompleted ? 'Review' : (isLocked ? 'Unlock' : 'Start Journey')}
+                    {isCompleted ? 'Review Core' : isInProgress ? 'Resume Lab' : 'Initialize'}
                   </button>
                 </div>
               </div>
             );
           })
         ) : (
-          <div className="peak-card" style={{ textAlign: 'center', color: 'var(--text-muted)', gridColumn: '1 / -1' }}>
-            <p style={{ fontSize: '1.25rem' }}>No modules found in this sector. 🛰️</p>
-            <button className="btn btn-outline" style={{ marginTop: '1.5rem' }}>Refresh Database</button>
+          <div className="peak-card text-center text-text-muted col-span-full py-20">
+            <p className="text-xl font-black mb-6 tracking-tight">No courses broadcasted from the central server yet. 🛰️</p>
+            <button className="btn btn-outline" onClick={() => window.location.reload()}>Refresh Uplink</button>
           </div>
         )}
       </div>
 
       {/* Quick Lab Section */}
-      <section className="peak-card" style={{ 
-        marginTop: '8rem', 
-        background: 'linear-gradient(135deg, hsla(158, 94%, 30%, 0.05) 0%, hsla(199, 89%, 48%, 0.05) 100%)',
-        padding: '4rem'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '2.5rem', marginBottom: '3.5rem' }}>
-          <div style={{ 
-            fontSize: '4rem', 
-            background: 'white', 
-            width: '100px', 
-            height: '100px', 
-            borderRadius: '24px', 
-            display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'center',
-            boxShadow: '0 10px 30px rgba(0,0,0,0.05)'
-          }}>⚡</div>
-          <div>
-            <h3 style={{ fontSize: '2.25rem', marginBottom: '0.5rem' }}>Constructivist Sandbox</h3>
-            <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>Test your theories, build components, and experiment in a zero-risk lab environment.</p>
+      <section className="peak-card mx-6 mt-32 p-8 md:p-16 bg-gradient-to-br from-secondary/5 via-primary/5 to-transparent border-primary/10 relative overflow-hidden group">
+        <div className="absolute -right-20 -top-20 w-64 h-64 bg-secondary/5 rounded-full blur-3xl group-hover:bg-secondary/10 transition-all duration-700"></div>
+        <div className="flex flex-col md:flex-row items-center gap-10 mb-12 relative z-10">
+          <div className="text-5xl bg-white w-24 h-24 flex items-center justify-center rounded-3xl shadow-xl shadow-secondary/10 group-hover:scale-110 transition-transform duration-500">🧪</div>
+          <div className="text-center md:text-left">
+            <h3 className="text-3xl md:text-4xl font-black mb-3">The Constructivist Sandbox</h3>
+            <p className="text-text-muted text-lg max-w-xl">Test your theories, build reactive components, and experiment in a high-fidelity, zero-risk neural lab environment.</p>
           </div>
         </div>
-        <LiveEditor />
+        <div className="relative z-10 shadow-2xl rounded-2xl overflow-hidden border border-white/10 ring-8 ring-black/5">
+          <LiveEditor />
+        </div>
       </section>
     </div>
+  );
+}
+
   );
 }

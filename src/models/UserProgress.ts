@@ -9,6 +9,13 @@ export interface IUserProgress extends Document {
   currentStep: number; // 0: Engage, 1: Explore, 2: Explain, 3: Elaborate, 4: Evaluate
   reflection?: string;
   completedAt?: Date;
+  personalizedContent?: {
+    engage: string;
+    explore: string;
+    explain: string;
+    elaborate: string;
+    evaluate: string;
+  };
   createdAt: Date;
   updatedAt: Date;
 }
@@ -27,6 +34,13 @@ const UserProgressSchema: Schema = new Schema(
     currentStep: { type: Number, default: 0 },
     reflection: { type: String, default: '' },
     completedAt: { type: Date },
+    personalizedContent: {
+      engage: { type: String },
+      explore: { type: String },
+      explain: { type: String },
+      elaborate: { type: String },
+      evaluate: { type: String },
+    },
   },
   { timestamps: true }
 );

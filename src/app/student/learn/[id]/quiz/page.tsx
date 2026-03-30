@@ -2,23 +2,15 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-
-interface Question {
-  question: string;
-  options: string[];
-  correctAnswer: number;
-  explanation: string;
-}
-
-interface Module {
-  _id: string;
-  title: string;
-  questions: Question[];
-}
+import { useSession } from 'next-auth/react';
+import { Module, Question, StudentProgress } from '@/types';
 
 export default function QuizPage({ params }: { params: Promise<{ id: string }> }) {
   const [id, setId] = useState<string | null>(null);
   const router = useRouter();
+  const { data: session } = useSession();
+  const userId = (session?.user as { id?: string })?.id || 'guest';
+  
   const [module, setModule] = useState<Module | null>(null);
   const [loading, setLoading] = useState(true);
   const [answers, setAnswers] = useState<number[]>([]);
@@ -38,9 +30,9 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
             setModule(data.data);
             setAnswers(new Array(data.data.questions?.length || 0).fill(-1));
           }
-          setLoading(false);
         })
-        .catch(() => setLoading(false));
+        .catch(err => console.error('[Quiz Logic] Neural disconnect:', err))
+        .finally(() => setLoading(false));
     }
   }, [id]);
 
@@ -66,120 +58,110 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
     setScore(finalScore);
     setSubmitted(true);
 
-    if (finalScore >= 70) {
-      // Complete module and unlock next
-      await fetch('/api/progress', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userId: 'default_student',
-          moduleId: id,
-          status: 'completed',
-          score: finalScore,
-        }),
-      });
-    }
+    // Save progress regardless of score, but set status to completed only if passed
+    await fetch('/api/progress', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        userId,
+        moduleId: id,
+        status: finalScore >= 70 ? 'completed' : 'in-progress',
+        score: finalScore,
+      }),
+    });
   };
 
-  if (loading) return <div className="glass-card" style={{ textAlign: 'center' }}>Loading activity...</div>;
-  if (!module) return <div className="glass-card" style={{ textAlign: 'center' }}>Module not found.</div>;
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-6">
+        <div className="w-12 h-12 rounded-full border-4 border-primary-glow border-t-primary animate-spin" />
+        <p className="text-text-muted font-black uppercase tracking-widest text-xs">Calibrating Assessment Neural-Links...</p>
+      </div>
+    );
+  }
+
+  if (!module) return <div className="peak-card text-center py-20 max-w-md mx-auto mt-20">Signal Lost: Assessment unavailable.</div>;
+  
   if (!module.questions || module.questions.length === 0) {
     return (
-      <div className="glass-card" style={{ textAlign: 'center' }}>
-        <h3>No activity for this module.</h3>
-        <button onClick={() => router.push('/student')} className="btn btn-primary" style={{ marginTop: '1rem' }}>Back to Dashboard</button>
+      <div className="peak-card text-center py-20 max-w-md mx-auto mt-20">
+        <h3 className="text-2xl font-black mb-4">No validation metrics found.</h3>
+        <p className="text-text-muted mb-8 italic">Your teacher hasn&apos;t defined any confirmative questions for this sector yet.</p>
+        <button onClick={() => router.push('/student')} className="btn btn-primary px-8 py-3">Back to Hub</button>
       </div>
     );
   }
 
   return (
-    <div className="animate-fade-in" style={{ maxWidth: '1000px', margin: '0 auto', padding: '4rem 1rem' }}>
-      {/* Navigation & Progress */}
-      <nav style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4rem' }}>
-        <button onClick={() => router.push(`/student/learn/${id}/intro`)} style={{ color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem' }}>
-          ← Back to Intro
+    <div className="max-w-4xl mx-auto py-12 px-4 animate-fade-in">
+      {/* Navigation & Progress Hub */}
+      <nav className="flex flex-col md:flex-row justify-between items-center gap-6 mb-16 bg-white/50 backdrop-blur-md p-6 rounded-3xl border border-border/10 shadow-sm">
+        <button onClick={() => router.push(`/student/learn/${id}/intro`)} className="text-text-muted font-black text-[0.7rem] uppercase tracking-widest flex items-center gap-2 hover:text-primary transition-all group">
+          <span className="transition-transform group-hover:-translate-x-1">←</span> Return to Synthesis View
         </button>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flex: 1, maxWidth: '300px', marginLeft: '2rem' }}>
-          <div style={{ height: '4px', background: 'rgba(255,255,255,0.1)', flex: 1, borderRadius: '2px', overflow: 'hidden' }}>
-            <div style={{ width: submitted ? '100%' : '66%', height: '100%', background: 'var(--primary)', boxShadow: '0 0 10px var(--primary-glow)' }}></div>
-          </div>
-          <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 700 }}>{submitted ? 'FINAL STEP' : 'STEP 2/3'}</span>
+        <div className="flex items-center gap-4 flex-1 max-w-sm w-full">
+           <div className="text-[0.6rem] font-black text-text-muted uppercase tracking-tighter whitespace-nowrap">Validation Flux:</div>
+           <div className="h-2 bg-slate-100 flex-1 rounded-full overflow-hidden">
+             <div className="h-full bg-primary transition-all duration-1000 shadow-[0_0_10px_var(--primary-glow)]" style={{ width: submitted ? '100%' : '85%' }}></div>
+           </div>
+           <span className="text-[0.7rem] font-black text-primary uppercase">{submitted ? 'FINALIZED' : 'STEP 3/3'}</span>
         </div>
       </nav>
 
-      <header style={{ marginBottom: '4rem' }}>
-        <h2 className="gradient-text" style={{ fontSize: '3rem', lineHeight: '1.2' }}>Confirmation Activity</h2>
-        <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', marginTop: '0.5rem' }}>Reflect on your knowledge to proceed to the next module.</p>
+      <header className="mb-14 text-center md:text-left">
+        <h2 className="text-4xl md:text-5xl font-black mb-4 tracking-tight leading-tight">
+           <span className="gradient-text">Confirmative Validation</span>
+        </h2>
+        <p className="text-text-muted text-lg max-w-2xl italic opacity-80 leading-relaxed font-medium">
+           Finalize your constructivist journey by documenting your mastery of the theoretical and experimental principles.
+        </p>
       </header>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+      <div className="flex flex-col gap-8 mb-16">
         {module.questions.map((q, qIndex) => (
           <div 
             key={qIndex} 
-            className="glass-card" 
-            style={{ 
-              borderLeft: submitted && answers[qIndex] === q.correctAnswer ? '4px solid var(--secondary)' : (submitted ? '4px solid var(--accent)' : '1px solid var(--glass-border)') 
-            }}
+            className={`peak-card p-8 md:p-10 transition-all duration-500 border-l-8 ${submitted && answers[qIndex] === q.correctAnswer ? 'border-emerald-500 bg-emerald-500/5' : (submitted ? 'border-red-500 bg-red-500/5' : 'border-border/20 hover:border-primary/30')}`}
           >
-            <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'flex-start' }}>
-              <div style={{ 
-                width: '40px', 
-                height: '40px', 
-                background: 'rgba(255,255,255,0.05)', 
-                borderRadius: '50%', 
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'center',
-                fontWeight: 800,
-                color: 'var(--primary)',
-                flexShrink: 0
-              }}>
+            <div className="flex gap-6 items-start">
+              <div className="w-12 h-12 rounded-2xl bg-white shadow-xl shadow-slate-200/50 flex items-center justify-center font-black text-primary text-xl flex-shrink-0">
                 {qIndex + 1}
               </div>
-              <div style={{ flex: 1 }}>
-                <h4 style={{ fontSize: '1.25rem', marginBottom: '2rem', lineHeight: '1.5' }}>{q.question}</h4>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1rem' }}>
+              <div className="flex-1">
+                <h4 className="text-xl md:text-2xl font-black mb-8 leading-tight text-slate-800">{q.question}</h4>
+                <div className="grid grid-cols-1 gap-4">
                   {q.options.map((opt, optIndex) => (
                     <label 
                       key={optIndex} 
-                      style={{ 
-                        display: 'flex', 
-                        alignItems: 'center', 
-                        gap: '1rem', 
-                        padding: '1.25rem', 
-                        borderRadius: 'var(--radius-sm)', 
-                        background: answers[qIndex] === optIndex ? 'rgba(16, 185, 129, 0.1)' : 'rgba(255, 255, 255, 0.03)',
-                        border: answers[qIndex] === optIndex ? '1px solid var(--primary)' : '1px solid rgba(255,255,255,0.08)',
-                        cursor: submitted ? 'default' : 'pointer',
-                        transition: 'var(--transition)'
-                      }}
+                      className={`flex items-center gap-4 p-5 rounded-2xl border-2 transition-all duration-300 ${answers[qIndex] === optIndex ? 'bg-primary/5 border-primary shadow-lg shadow-primary/5' : 'bg-white border-slate-100 hover:border-slate-300'} ${submitted ? 'cursor-default' : 'cursor-pointer active:scale-95'}`}
                     >
+                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${answers[qIndex] === optIndex ? 'border-primary bg-primary' : 'border-slate-300 bg-white'}`}>
+                        {answers[qIndex] === optIndex && <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />}
+                      </div>
                       <input 
                         type="radio" 
+                        className="hidden"
                         name={`q-${qIndex}`} 
                         disabled={submitted}
                         checked={answers[qIndex] === optIndex} 
                         onChange={() => handleAnswerChange(qIndex, optIndex)} 
-                        style={{ accentColor: 'var(--primary)', width: '1.2rem', height: '1.2rem' }}
                       />
-                      <span style={{ fontSize: '1rem', fontFamily: 'var(--font-alt)' }}>{opt}</span>
+                      <span className="text-base font-bold text-slate-700 leading-snug">{opt}</span>
                     </label>
                   ))}
                 </div>
 
                 {submitted && (
-                  <div style={{ 
-                    marginTop: '2rem', 
-                    padding: '1.5rem', 
-                    background: 'rgba(255,255,255,0.03)', 
-                    borderRadius: 'var(--radius-sm)',
-                    border: '1px solid rgba(255,255,255,0.05)'
-                  }}>
-                    <p style={{ color: answers[qIndex] === q.correctAnswer ? 'var(--secondary)' : 'var(--accent)', fontWeight: 800, marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                      {answers[qIndex] === q.correctAnswer ? '<span>✔️</span> CORRECT' : '<span>❌</span> THINK AGAIN'}
-                    </p>
-                    <p style={{ fontSize: '0.95rem', color: 'var(--text-muted)', lineHeight: '1.6', fontStyle: 'italic' }}>
-                      <strong style={{ color: 'white', fontStyle: 'normal' }}>Pedagogical Note:</strong> {q.explanation}
+                  <div className={`mt-8 p-6 rounded-2xl border flex flex-col gap-3 animate-fade-in ${answers[qIndex] === q.correctAnswer ? 'bg-emerald-50 border-emerald-100' : 'bg-red-50 border-red-100'}`}>
+                    <div className={`text-xs font-black uppercase tracking-[0.2em] flex items-center gap-2 ${answers[qIndex] === q.correctAnswer ? 'text-emerald-600' : 'text-red-600'}`}>
+                      {answers[qIndex] === q.correctAnswer ? (
+                        <><span>✔️</span> NEURAL SYNC ESTABLISHED</>
+                      ) : (
+                        <><span>❌</span> PARITY ERROR DETECTED</>
+                      )}
+                    </div>
+                    <p className="text-sm text-slate-700 italic leading-relaxed">
+                      <span className="font-black opacity-60 uppercase mr-2 non-italic">Architecture Note:</span> {q.explanation}
                     </p>
                   </div>
                 )}
@@ -190,52 +172,54 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
       </div>
 
       {!submitted ? (
-        <div style={{ textAlign: 'center', marginTop: '5rem' }}>
+        <div className="flex flex-col items-center gap-6 mt-16">
+          <p className="text-[0.6rem] font-bold text-text-muted uppercase tracking-[0.3em] opacity-60">Complete all validation points to finalize</p>
           <button 
             onClick={handleSubmit} 
             disabled={answers.includes(-1)}
-            className="btn btn-primary" 
-            style={{ padding: '1.25rem 4rem', fontSize: '1.1rem' }}
+            className="btn btn-primary px-16 py-5 text-xl font-black shadow-2xl shadow-primary/30 group disabled:opacity-30 disabled:grayscale transition-all hover:scale-105"
           >
-            Submit My Reflections
+            TRANSMIT REFLECTIONS <span className="inline-block transition-transform group-hover:translate-x-1">→</span>
           </button>
         </div>
       ) : (
-        <div className="glass-card animate-float" style={{ textAlign: 'center', marginTop: '6rem', border: '1px solid var(--primary-glow)' }}>
-          <h3 style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>Activity Result 🛰️</h3>
-          <div style={{ fontSize: '4rem', fontWeight: 800, color: 'var(--primary)', margin: '1rem 0' }}>{score}%</div>
+        <div className="peak-card mt-20 mb-32 p-12 md:p-20 text-center border-4 border-primary-glow/50 bg-[radial-gradient(circle_at_top,var(--primary-glow)_0%,transparent_100%)] animate-float animate-fade-in">
+          <div className="text-[0.7rem] font-black text-primary uppercase tracking-[0.4em] mb-4">Neural Validation Coefficient</div>
+          <div className="text-8xl md:text-9xl font-black text-foreground mb-10 drop-shadow-2xl">
+             {score}<span className="text-4xl text-primary opacity-50">%</span>
+          </div>
           
           {score >= 70 ? (
             <div className="animate-fade-in">
-              <p style={{ color: 'var(--secondary)', fontSize: '1.1rem', marginBottom: '2.5rem', maxWidth: '400px', margin: '0 auto 2.5rem' }}>
-                Mastery achieved! You&apos;ve successfully constructed this knowledge block.
+              <h3 className="text-2xl md:text-3xl font-black text-emerald-600 mb-6 uppercase tracking-tight">Mastery Confirmed 🛡️</h3>
+              <p className="text-text-muted text-lg font-medium max-w-xl mx-auto mb-12 leading-relaxed italic opacity-80">
+                Parity check complete. You have successfully constructed this theoretical pillar within your ICT schema.
               </p>
               <button 
                 onClick={() => router.push('/student')} 
-                className="btn btn-primary"
-                style={{ background: 'linear-gradient(135deg, var(--primary) 0%, #059669 100%)', boxShadow: '0 4px 12px var(--primary-glow)' }}
+                className="btn btn-primary px-16 py-5 text-xl font-black shadow-2xl shadow-primary/40 rounded-full border-b-8 border-primary-dark transition-all active:translate-y-2 active:border-b-0"
               >
-                Return to Hub →
+                RETURN TO HUB COMMAND →
               </button>
             </div>
           ) : (
             <div className="animate-fade-in">
-              <p style={{ color: 'var(--accent)', fontSize: '1.1rem', marginBottom: '2.5rem', maxWidth: '400px', margin: '0 auto 2.5rem' }}>
-                You&apos;re still identifying patterns. Review the introduction to solidify your understanding.
+              <h3 className="text-2xl md:text-3xl font-black text-red-600 mb-6 uppercase tracking-tight">Sync Incomplete 📡</h3>
+              <p className="text-text-muted text-lg font-medium max-w-xl mx-auto mb-12 leading-relaxed italic opacity-80">
+                Neural parity at {score}% is below the required 70% threshold. Revisit the discovery stages to solidify your understanding.
               </p>
-              <div style={{ display: 'flex', gap: '1.5rem', justifyContent: 'center' }}>
+              <div className="flex flex-col md:flex-row gap-6 justify-center">
                 <button 
                   onClick={() => window.location.reload()} 
-                  className="btn btn-primary" 
-                  style={{ background: 'var(--accent)', borderColor: 'var(--accent)', boxShadow: '0 4px 12px rgba(217, 119, 6, 0.3)' }}
+                  className="btn btn-primary px-12 py-4 font-black shadow-xl shadow-primary/20 bg-amber-600 border-amber-800"
                 >
-                  Retry Activity
+                  RE-INITIALIZE TEST
                 </button>
                 <button 
                   onClick={() => router.push(`/student/learn/${id}/intro`)} 
-                  className="btn btn-outline" 
+                  className="btn btn-outline px-12 py-4 font-black text-slate-800 border-2" 
                 >
-                  Review Intro
+                  REVISIT DISCOVERY SECTOR
                 </button>
               </div>
             </div>

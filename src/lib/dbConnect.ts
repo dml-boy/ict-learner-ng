@@ -1,4 +1,8 @@
 import mongoose from 'mongoose';
+import dns from 'dns';
+
+// Force Google DNS for SRV/TXT lookups — fixes ESERVFAIL on restricted networks with mongodb+srv://
+dns.setServers(['8.8.8.8', '8.8.4.4', '1.1.1.1']);
 
 const MONGODB_URI = process.env.MONGODB_URI;
 

@@ -5,6 +5,7 @@ export interface ITopic extends Document {
   description: string;
   category: string;
   subjectId: Types.ObjectId;
+  createdBy: Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -15,6 +16,7 @@ const TopicSchema: Schema = new Schema(
     description: { type: String, required: true },
     category: { type: String, required: true, default: 'General ICT' },
     subjectId: { type: Schema.Types.ObjectId, ref: 'Subject', required: true },
+    createdBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   },
   { timestamps: true }
 );

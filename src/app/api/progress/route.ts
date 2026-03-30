@@ -48,6 +48,7 @@ export async function POST(request: NextRequest) {
       selectedContext?: string;
       currentStep?: number;
       reflection?: string;
+      personalizedContent?: Record<string, string>;
     }
     const updateData: UpdateData = { 
       status: status || 'in-progress',
@@ -57,6 +58,7 @@ export async function POST(request: NextRequest) {
     if (selectedContext) updateData.selectedContext = selectedContext;
     if (typeof currentStep === 'number') updateData.currentStep = currentStep;
     if (typeof reflection === 'string') updateData.reflection = reflection;
+    if (body.personalizedContent) updateData.personalizedContent = body.personalizedContent;
 
     const updatedProgress = await UserProgress.findOneAndUpdate(
       { userId, moduleId },

@@ -19,6 +19,7 @@ export interface IModule extends Document {
     explanation: string;
   }[];
   nextModuleId?: Types.ObjectId;
+  createdBy: Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -45,6 +46,7 @@ const ModuleSchema: Schema = new Schema(
       },
     ],
     nextModuleId: { type: Schema.Types.ObjectId, ref: 'Module' },
+    createdBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   },
   { timestamps: true }
 );

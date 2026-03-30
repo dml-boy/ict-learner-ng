@@ -6,6 +6,7 @@ export interface ISubject extends Document {
   icon: string;
   color: string;
   allowedContexts: string[];
+  createdBy: mongoose.Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -17,6 +18,7 @@ const SubjectSchema: Schema = new Schema(
     icon: { type: String, default: '📚' },
     color: { type: String, default: '#3b82f6' },
     allowedContexts: { type: [String], default: [] },
+    createdBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   },
   { timestamps: true }
 );
