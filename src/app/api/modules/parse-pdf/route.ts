@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/auth';
-// @ts-ignore
-import pdfParse from 'pdf-parse/lib/pdf-parse.js';
+// Use require for pdf-parse as it often lacks proper ESM exports
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const pdfParse = require('pdf-parse');
 
 export async function POST(request: NextRequest) {
   try {

@@ -13,6 +13,7 @@ export default function ModulesTab({ modules, setModules, topics, subjects }: {
   const [modType, setModType] = useState<'lesson' | 'activity' | 'project'>('lesson');
   const [isUploading, setIsUploading] = useState(false);
   const [isSynthesizing, setIsSynthesizing] = useState(false);
+  const [isRegenerating, setIsRegenerating] = useState(false);
   const [aiGeneratedData, setAiGeneratedData] = useState<AiGeneratedData | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -86,6 +87,37 @@ export default function ModulesTab({ modules, setModules, topics, subjects }: {
       alert('AI Engine failure. Please try again or refine your input.');
     } finally {
       setIsSynthesizing(false);
+    }
+  };
+
+  const handleRegenerate = async () => {
+    setIsRegenerating(true);
+    try {
+      const selectedTopic = topics.find(t => t._id === modTopicId);
+      const subjectId = typeof selectedTopic?.subjectId === 'object' ? selectedTopic.subjectId._id : selectedTopic?.subjectId;
+      const selectedSubject = subjects.find(s => s._id === subjectId);
+      const contextOptions = selectedSubject?.allowedContexts || ['Student', 'Professional', 'Entrepreneur'];
+
+      const res = await fetch('/api/ai/generate-module', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          topic: modContent,
+          contextOptions
+        }),
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        setAiGeneratedData(data.data);
+      } else {
+        throw new Error(data.error || 'Regeneration failed');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('AI Engine failure during regeneration.');
+    } finally {
+      setIsRegenerating(false);
     }
   };
 
@@ -203,7 +235,17 @@ export default function ModulesTab({ modules, setModules, topics, subjects }: {
               <h4 className="text-primary m-0 flex items-center gap-2 font-extrabold">
                 <span>✨</span> AI Synthesis: Active Review & Refinement
               </h4>
-              <div className="tag-nigeria text-[0.7rem]">Constructivist Guardrails Active</div>
+              <div className="flex items-center gap-4">
+                <button 
+                  type="button" 
+                  onClick={handleRegenerate} 
+                  disabled={isRegenerating}
+                  className="text-[0.7rem] bg-secondary/10 text-secondary border border-secondary/20 px-3 py-1 rounded-full hover:bg-secondary/20 transition-all font-bold"
+                >
+                  {isRegenerating ? '🔄 Regenerating...' : '🔄 Full Regeneration'}
+                </button>
+                <div className="tag-nigeria text-[0.7rem]">Constructivist Guardrails Active</div>
+              </div>
             </div>
             
             {aiGeneratedData.constructivistNote && (
@@ -336,36 +378,98 @@ export default function ModulesTab({ modules, setModules, topics, subjects }: {
         )}
       </form>
 
-      <div className="dashboard-grid">
-        {modules.length === 0 ? <div className="peak-card text-center text-text-muted col-span-full">No foundational blueprints currently deployed.</div> : (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {modules.length === 0 ? (
+          <div className="peak-card text-center text-text-muted col-span-full py-20 border-dashed">
+            <span className="text-4xl mb-4 block">📭</span>
+            No foundational blueprints currently deployed. Start by synthesizing a new module above.
+          </div>
+        ) : (
           modules.map(mod => (
-            <div key={mod._id} className="peak-card flex flex-col h-full">
-              <div className="flex justify-between mb-6">
-                <div>
-                  <h4 className="text-[1.4rem] mb-2">{mod.title}</h4>
+            <div key={mod._id} className="peak-card group flex flex-col h-full bg-linear-to-b from-[rgba(255,255,255,0.03)] to-transparent border-white/5 hover:border-primary-glow/50 transition-all duration-500 hover:-translate-y-1 relative overflow-hidden">
+              {/* Animated Accent */}
+              <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-primary via-secondary to-primary opacity-30 group-hover:opacity-100 transition-opacity" />
+              
+              <div className="flex justify-between items-start mb-6 pt-2">
+                <div className="flex-1">
+                  <h4 className="text-[1.25rem] font-black text-foreground mb-2 group-hover:text-primary transition-colors line-clamp-1">{mod.title}</h4>
                   <div className="flex gap-2 items-center">
-                    <span className="tag-nigeria text-[0.7rem]">{mod.type === 'lesson' ? '📖' : mod.type === 'activity' ? '🛠️' : '🚀'} {mod.type}</span>
-                    {mod.questions?.length > 0 && <span className="text-[0.7rem] text-secondary">• {mod.questions.length} Questions</span>}
+                    <span className={`text-[0.65rem] font-bold px-2 py-0.5 rounded-full flex items-center gap-1.5 ${
+                      mod.type === 'lesson' ? 'bg-primary/10 text-primary' : 
+                      mod.type === 'activity' ? 'bg-secondary/10 text-secondary' : 
+                      'bg-accent/10 text-accent'
+                    }`}>
+                      {mod.type === 'lesson' ? '📖' : mod.type === 'activity' ? '🛠️' : '🚀'} 
+                      {mod.type.toUpperCase()}
+                    </span>
+                    <span className="text-[0.6rem] text-text-muted font-mono uppercase tracking-tighter decoration-secondary/30 decoration-dotted underline underline-offset-4">
+                      {typeof mod.topicId === 'object' && mod.topicId !== null && 'title' in mod.topicId ? (mod.topicId as Topic).title : 'Topic Linked'}
+                    </span>
                   </div>
                 </div>
-                <button onClick={() => handleDeleteModule(mod._id)} className="text-[#ef4444] bg-none border-none cursor-pointer text-xl h-fit">✕</button>
+                <button 
+                  onClick={() => handleDeleteModule(mod._id)} 
+                  className="w-8 h-8 flex items-center justify-center rounded-full bg-white/5 text-[#ef4444] hover:bg-[#ef4444]/10 transition-colors"
+                  title="Delete Blueprint"
+                >
+                  ✕
+                </button>
               </div>
               
-              <div className="flex gap-1 mb-4">
-                {['engage', 'explore', 'explain', 'evaluate'].map(phase => (
-                  <div key={phase} title={`${phase.toUpperCase()} active`} className={`h-1 flex-1 rounded-sm ${ (mod as unknown as Record<string, string>)[phase] ? 'bg-primary' : 'bg-[rgba(255,255,255,0.1)]'}`} />
-                ))}
+              {/* 5E Phase Health Check */}
+              <div className="mb-6">
+                <div className="flex justify-between items-center mb-2.5">
+                  <span className="text-[0.6rem] font-black text-text-muted uppercase tracking-widest">5E Phase Integrity</span>
+                  <span className="text-[0.6rem] font-mono text-primary font-bold">
+                    { [mod.engage, mod.explore, mod.explain, mod.elaborate, mod.evaluate].filter(Boolean).length } / 5 Phases
+                  </span>
+                </div>
+                <div className="flex gap-1.5 h-1.5">
+                  {[
+                    { key: 'engage', color: 'bg-primary' },
+                    { key: 'explore', color: 'bg-primary' },
+                    { key: 'explain', color: 'bg-primary' },
+                    { key: 'elaborate', color: 'bg-secondary' },
+                    { key: 'evaluate', color: 'bg-accent' }
+                  ].map(phase => (
+                    <div 
+                      key={phase.key} 
+                      title={`${phase.key.toUpperCase()} Status`}
+                      className={`flex-1 rounded-full transition-all duration-700 ${ 
+                        (mod as unknown as Record<string, string | Record<string, string>>)[phase.key] 
+                        ? (phase.key === 'elaborate' ? (Object.keys(mod.elaborate || {}).length > 0 ? phase.color : 'bg-white/10') : phase.color) 
+                        : 'bg-white/5 group-hover:bg-white/10' 
+                      }`} 
+                    />
+                  ))}
+                </div>
               </div>
 
-              <p className="text-text-muted leading-relaxed text-[0.9rem] mb-6 flex-1">
-                {mod.content.substring(0, 100)}...
+              <p className="text-text-muted leading-relaxed text-[0.85rem] mb-8 flex-1 line-clamp-3 italic opacity-80 decoration-primary/10 decoration-wavy underline underline-offset-8">
+                &quot;{mod.content.substring(0, 120)}...&quot;
               </p>
 
-              {mod.constructivistNote && (
-                <div className="p-3 bg-[rgba(0,0,0,0.2)] rounded-md text-[0.8rem] italic text-primary-light border-l-2 border-primary">
-                  &quot;{mod.constructivistNote.substring(0, 80)}...&quot;
+              <div className="flex flex-col gap-4 mt-auto">
+                <div className="flex justify-between items-center text-[0.65rem] border-t border-white/5 pt-4">
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-1.5 text-secondary">
+                      <span className="text-lg">📝</span>
+                      <span className="font-bold">{mod.questions?.length || 0} QUERIES</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-primary">
+                      <span className="text-lg">👤</span>
+                      <span className="font-bold">{Object.keys(mod.elaborate || {}).length} ROLES</span>
+                    </div>
+                  </div>
+                  <span className="text-text-muted font-mono">{new Date(mod.createdAt).toLocaleDateString()}</span>
                 </div>
-              )}
+                
+                {mod.constructivistNote && (
+                  <div className="p-3 bg-primary/5 rounded-lg text-[0.7rem] italic text-primary-light border-l-2 border-primary/40 group-hover:border-primary transition-colors">
+                    &quot;{mod.constructivistNote.substring(0, 90)}...&quot;
+                  </div>
+                )}
+              </div>
             </div>
           ))
         )}

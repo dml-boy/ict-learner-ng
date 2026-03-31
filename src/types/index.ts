@@ -46,6 +46,8 @@ export interface Module {
   constructivistNote: string;
   questions: Question[];
   createdBy?: { _id: string; name: string };
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface StudentProgress {

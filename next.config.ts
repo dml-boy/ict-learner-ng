@@ -9,6 +9,11 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  // turbopack is a top-level key in Next.js 15+/16, not under experimental.
+  // Setting root silences the multiple-lockfile warning (stray pnpm-lock.yaml at C:\Users\Admin).
+  turbopack: {
+    root: __dirname,
+  },
 };
 
 export default nextConfig;
