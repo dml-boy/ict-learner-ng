@@ -17,46 +17,47 @@ export default function SubjectsTab({ subjects, setSubjects }: {
 
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
-    let finalIcon = icon;
+    setIsUploading(true);
+    let finalIcon = icon; // default: current emoji '📚' or whatever is set
 
-    if (imageFile) {
-      setIsUploading(true);
-      try {
+    try {
+      // Step 1: If an image was selected, upload it first
+      if (imageFile) {
         const formData = new FormData();
         formData.append('file', imageFile);
         const uploadRes = await fetch('/api/upload', { method: 'POST', body: formData });
         const uploadData = await uploadRes.json();
-        
-        if (uploadData.success && uploadData.url) {
-          finalIcon = uploadData.url;
-        } else {
-          alert(uploadData.error || 'Failed to upload image to CDN');
-          setIsUploading(false);
-          return;
-        }
-      } catch (err) {
-        console.error(err);
-        alert('Upload failure.');
-        setIsUploading(false);
-        return;
-      }
-    } else {
-      setIsUploading(true);
-    }
 
-    try {
+        if (uploadData.success && uploadData.url) {
+          finalIcon = uploadData.url; // swap icon for the GitHub CDN URL
+        } else {
+          alert(uploadData.error || 'Image upload failed. Subject will be created with the default icon.');
+          finalIcon = '📚'; // fallback gracefully — don't block creation
+        }
+      }
+
+      // Step 2: Create the subject (always runs, image is optional)
       const res = await fetch('/api/subjects', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ title, description: desc, icon: finalIcon, color, allowedContexts: contexts }),
       });
       const data = await res.json();
+
       if (data.success) {
         setSubjects([data.data, ...subjects]);
-        setTitle(''); setDesc(''); setContexts([]);
+        // Reset all fields
+        setTitle('');
+        setDesc('');
+        setContexts([]);
         setImageFile(null);
         setIcon('📚');
+      } else {
+        alert(data.error || 'Failed to create subject.');
       }
+    } catch (err) {
+      console.error('[SubjectsTab] Creation failure:', err);
+      alert('An unexpected error occurred. Please try again.');
     } finally {
       setIsUploading(false);
     }
