@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Image from 'next/image';
 import { Subject } from '@/types';
 
 export default function SubjectsTab({ subjects, setSubjects }: { 
@@ -11,18 +12,53 @@ export default function SubjectsTab({ subjects, setSubjects }: {
   const [color, setColor] = useState('#3b82f6');
   const [contexts, setContexts] = useState<string[]>([]);
   const [currentContext, setCurrentContext] = useState('');
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
-    const res = await fetch('/api/subjects', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title, description: desc, icon, color, allowedContexts: contexts }),
-    });
-    const data = await res.json();
-    if (data.success) {
-      setSubjects([data.data, ...subjects]);
-      setTitle(''); setDesc(''); setContexts([]);
+    let finalIcon = icon;
+
+    if (imageFile) {
+      setIsUploading(true);
+      try {
+        const formData = new FormData();
+        formData.append('file', imageFile);
+        const uploadRes = await fetch('/api/upload', { method: 'POST', body: formData });
+        const uploadData = await uploadRes.json();
+        
+        if (uploadData.success && uploadData.url) {
+          finalIcon = uploadData.url;
+        } else {
+          alert(uploadData.error || 'Failed to upload image to CDN');
+          setIsUploading(false);
+          return;
+        }
+      } catch (err) {
+        console.error(err);
+        alert('Upload failure.');
+        setIsUploading(false);
+        return;
+      }
+    } else {
+      setIsUploading(true);
+    }
+
+    try {
+      const res = await fetch('/api/subjects', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, description: desc, icon: finalIcon, color, allowedContexts: contexts }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setSubjects([data.data, ...subjects]);
+        setTitle(''); setDesc(''); setContexts([]);
+        setImageFile(null);
+        setIcon('📚');
+      }
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -42,9 +78,19 @@ export default function SubjectsTab({ subjects, setSubjects }: {
             <label className="auth-label">Subject Designation (Title)</label>
             <input type="text" placeholder="e.g. Computer Science v5" value={title} onChange={e => setTitle(e.target.value)} className="input" required />
           </div>
-          <div className="flex-1">
-            <label className="auth-label">Semantic Icon</label>
-            <input type="text" value={icon} onChange={e => setIcon(e.target.value)} className="input text-center text-xl" />
+          <div className="flex-[1.5]">
+            <label className="auth-label">Semantic Cover (Image)</label>
+            <input 
+              type="file" 
+              accept="image/*" 
+              onChange={e => {
+                if(e.target.files?.[0]) {
+                  setImageFile(e.target.files[0]);
+                  setIcon('Image Attached');
+                }
+              }} 
+              className="input file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-[0.7rem] file:font-black file:uppercase file:bg-primary/10 file:text-primary hover:file:bg-primary/20 text-sm p-[0.35rem]" 
+            />
           </div>
           <div className="flex-1">
             <label className="auth-label">Brand Color</label>
@@ -84,8 +130,8 @@ export default function SubjectsTab({ subjects, setSubjects }: {
           </div>
         </div>
 
-        <button type="submit" className="btn btn-primary px-10 py-4 shadow-[0_10px_20px_var(--primary-glow)]">
-          🚀 Define Academic Sector
+        <button type="submit" disabled={isUploading} className="btn btn-primary px-10 py-4 shadow-[0_10px_20px_var(--primary-glow)] disabled:opacity-50">
+          {isUploading ? '🔄 Uploading & Defining...' : '🚀 Define Academic Sector'}
         </button>
       </form>
 
@@ -99,7 +145,11 @@ export default function SubjectsTab({ subjects, setSubjects }: {
             <div key={sub._id} className="peak-card flex flex-col h-full border-t-4 transition-all hover:scale-[1.02]" style={{ borderTopColor: sub.color }}>
               <div className="flex justify-between items-start mb-6">
                 <div>
-                  <span className="text-3xl mb-2 block">{sub.icon}</span>
+                  {sub.icon?.startsWith('http') ? (
+                    <Image src={sub.icon} alt={sub.title} width={56} height={56} className="object-cover rounded-xl mb-4 shadow-sm border border-border/10" />
+                  ) : (
+                    <span className="text-3xl mb-2 block">{sub.icon}</span>
+                  )}
                   <h4 className="text-xl font-black">{sub.title}</h4>
                 </div>
                 <button onClick={() => handleDelete(sub._id)} className="text-[#ef4444] bg-none border-none cursor-pointer text-xl hover:scale-125 transition-transform">✕</button>
