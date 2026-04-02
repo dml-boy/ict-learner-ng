@@ -13,6 +13,7 @@ export default function SubjectsTab({ subjects, setSubjects }: {
   const [contexts, setContexts] = useState<string[]>([]);
   const [currentContext, setCurrentContext] = useState('');
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
 
   const handleAdd = async (e: React.FormEvent) => {
@@ -51,6 +52,7 @@ export default function SubjectsTab({ subjects, setSubjects }: {
         setDesc('');
         setContexts([]);
         setImageFile(null);
+        setImagePreview(null);
         setIcon('📚');
       } else {
         alert(data.error || 'Failed to create subject.');
@@ -71,8 +73,10 @@ export default function SubjectsTab({ subjects, setSubjects }: {
 
   return (
     <div className="animate-fade-in flex flex-col gap-12">
-      <form onSubmit={handleAdd} className="peak-card">
-        <h3 className="mb-8 font-extrabold flex items-center gap-2"><span className="text-primary text-2xl">📂</span> Create New Academic Sector</h3>
+      <form onSubmit={handleAdd} className="glass-panel">
+        <h3 className="mb-8 font-black flex items-center gap-2 fluid-text-h2">
+          <span className="text-primary">📂</span> Create New Academic Sector
+        </h3>
         
         <div className="flex flex-col md:flex-row gap-6 mb-6">
           <div className="flex-[3]">
@@ -80,18 +84,31 @@ export default function SubjectsTab({ subjects, setSubjects }: {
             <input type="text" placeholder="e.g. Computer Science v5" value={title} onChange={e => setTitle(e.target.value)} className="input" required />
           </div>
           <div className="flex-[1.5]">
-            <label className="auth-label">Semantic Cover (Image)</label>
-            <input 
-              type="file" 
-              accept="image/*" 
-              onChange={e => {
-                if(e.target.files?.[0]) {
-                  setImageFile(e.target.files[0]);
-                  setIcon('Image Attached');
-                }
-              }} 
-              className="input file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-[0.7rem] file:font-black file:uppercase file:bg-primary/10 file:text-primary hover:file:bg-primary/20 text-sm p-[0.35rem]" 
-            />
+            <label className="auth-label text-emerald-600 font-black">Semantic Cover (High-Fi Image)</label>
+            <div className="flex items-center gap-4">
+              <div className="relative group overflow-hidden w-14 h-14 rounded-xl border-2 border-dashed border-primary/20 flex items-center justify-center bg-primary/5 shrink-0">
+                {imagePreview ? (
+                  <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
+                ) : (
+                  <span className="text-xl opacity-20">📸</span>
+                )}
+                <input 
+                  type="file" 
+                  accept="image/*" 
+                  onChange={e => {
+                    const file = e.target.files?.[0];
+                    if(file) {
+                      setImageFile(file);
+                      setImagePreview(URL.createObjectURL(file));
+                    }
+                  }} 
+                  className="absolute inset-0 opacity-0 cursor-pointer" 
+                />
+              </div>
+              <div className="flex-1 text-[0.7rem] text-text-muted font-bold leading-tight">
+                {imageFile ? <span className="text-primary">Ready for Uplink: {imageFile.name}</span> : 'Select an image to replace the default icon.'}
+              </div>
+            </div>
           </div>
           <div className="flex-1">
             <label className="auth-label">Brand Color</label>
@@ -115,13 +132,13 @@ export default function SubjectsTab({ subjects, setSubjects }: {
 
         <div className="mb-10">
           <label className="auth-label">Cognitive Contexts (Available Personas)</label>
-          <div className="flex gap-4 mb-4">
+          <div className="flex flex-col sm:flex-row gap-4 mb-4">
             <input type="text" value={currentContext} onChange={e => setCurrentContext(e.target.value)} className="input" placeholder="e.g. Aspiring Architect, Data Scientist" />
-            <button type="button" className="btn btn-outline shrink-0" onClick={() => { if(currentContext) { setContexts([...contexts, currentContext]); setCurrentContext(''); } }}>
+            <button type="button" className="btn btn-outline shrink-0 w-full sm:w-auto" onClick={() => { if(currentContext) { setContexts([...contexts, currentContext]); setCurrentContext(''); } }}>
               <span>➕</span> Add Persona
             </button>
           </div>
-          <div className="flex gap-2 flex-wrap min-h-[2.5rem]">
+          <div className="flex gap-2 flex-wrap min-h-[2.5rem] p-2 bg-slate-50/50 rounded-xl border border-slate-100/50">
             {contexts.length === 0 ? <p className="text-text-muted text-sm italic py-2">No personas defined yet. These will be used for the AI synthesis context.</p> : contexts.map(ctx => (
               <span key={ctx} className="tag-nigeria flex items-center gap-2 animate-fade-in group">
                 {ctx} 
@@ -138,12 +155,12 @@ export default function SubjectsTab({ subjects, setSubjects }: {
 
       <div className="dashboard-grid">
         {subjects.length === 0 ? (
-          <div className="peak-card text-center text-text-muted col-span-full py-12">
+          <div className="glass-panel text-center text-text-muted col-span-full py-12">
             No academic sectors are currently initialized in your terminal.
           </div>
         ) : (
           subjects.map((sub: Subject) => (
-            <div key={sub._id} className="peak-card flex flex-col h-full border-t-4 transition-all hover:scale-[1.02]" style={{ borderTopColor: sub.color }}>
+            <div key={sub._id} className="glass-panel flex flex-col h-full border-t-4 transition-all hover:scale-[1.02]" style={{ borderTopColor: sub.color }}>
               <div className="flex justify-between items-start mb-6">
                 <div>
                   {sub.icon?.startsWith('http') ? (

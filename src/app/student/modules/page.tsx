@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 import { Subject, Topic, Module, StudentProgress } from '@/types';
 
@@ -100,7 +101,14 @@ export default function StudentModules() {
           </button>
           {subjects.map(s => (
             <button key={s._id} className={`tab-btn whitespace-nowrap px-6 py-2 rounded-full font-bold transition-all flex items-center gap-2 ${activeSubject === s._id ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-text-muted hover:text-foreground hover:bg-foreground/5'}`} onClick={() => setActiveSubject(s._id)}>
-              <span className="text-lg">{s.icon}</span> {s.title}
+              <span className="w-6 h-6 flex items-center justify-center relative overflow-hidden rounded-md">
+                {s.icon?.startsWith('http') ? (
+                  <Image src={s.icon} alt={s.title} fill className="object-cover" />
+                ) : (
+                  <span className="text-lg">{s.icon}</span>
+                )}
+              </span> 
+              {s.title}
             </button>
           ))}
         </div>
@@ -128,25 +136,29 @@ export default function StudentModules() {
             return (
               <div key={subject._id} className="animate-fade-in">
                 {/* Sector Header */}
-                <div className="flex items-center gap-6 mb-10 pb-6 border-b-2 transition-all group" style={{ borderBottomColor: `${subject.color}20` }}>
-                  <div className="w-20 h-20 md:w-24 md:h-24 flex items-center justify-center rounded-3xl text-4xl shadow-2xl group-hover:scale-110 transition-transform duration-500" style={{ background: `${subject.color}10`, color: subject.color }}>
-                    {subject.icon}
+                <div className="flex flex-col sm:flex-row sm:items-center gap-6 mb-10 pb-8 border-b-2 transition-all group" style={{ borderBottomColor: `${subject.color}20` }}>
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 flex items-center justify-center rounded-2xl md:rounded-3xl text-3xl md:text-4xl shadow-2xl group-hover:scale-110 transition-transform duration-500 relative overflow-hidden shrink-0" style={{ background: `${subject.color}10`, color: subject.color }}>
+                    {subject.icon?.startsWith('http') ? (
+                      <Image src={subject.icon} alt={subject.title} fill className="object-cover" />
+                    ) : (
+                      subject.icon
+                    )}
                   </div>
                   <div className="flex-1">
-                    <div className="flex flex-wrap items-center gap-4 mb-2">
-                      <h2 className="text-3xl md:text-5xl font-black tracking-tight">{subject.title}</h2>
-                      <div className="px-4 py-1.5 rounded-full text-[0.7rem] font-black uppercase tracking-widest border-2 shadow-sm" style={{ backgroundColor: `${subject.color}05`, color: subject.color, borderColor: `${subject.color}20` }}>
+                    <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-3">
+                      <h2 className="text-2xl md:text-4xl lg:text-5xl font-black tracking-tight leading-tight">{subject.title}</h2>
+                      <div className="px-4 py-1.5 rounded-full text-[0.65rem] font-black uppercase tracking-widest border-2 shadow-sm w-fit" style={{ backgroundColor: `${subject.color}05`, color: subject.color, borderColor: `${subject.color}20` }}>
                         SYNC: {completedCount}/{subjectModules.length} STAGES
                       </div>
                     </div>
-                    <p className="text-text-muted text-base md:text-lg italic opacity-80">&quot;{subject.description}&quot;</p>
+                    <p className="text-text-muted text-sm md:text-base lg:text-lg italic opacity-80">&quot;{subject.description}&quot;</p>
                   </div>
                 </div>
 
                 {subjectTopics.length === 0 ? (
                   <p className="text-text-muted text-sm italic ml-24 py-10">No topic clusters detected within this sector.</p>
                 ) : (
-                  <div className="flex flex-col gap-14 ml-0 md:ml-12 border-l-2 border-border/20 pl-6 md:pl-12">
+                  <div className="flex flex-col gap-14 ml-4 md:ml-12 border-l-2 border-border/20 pl-6 md:pl-12">
                     {subjectTopics.map(topic => {
                       const topicModules = getModulesForTopic(topic._id);
                       return (

@@ -4,13 +4,49 @@
   position: fixed;
   left: 0;
   top: 0;
-  background: white;
+  background: var(--card-bg);
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
   border-right: 1px solid var(--card-border);
   display: flex;
   flex-direction: column;
   padding: 2.5rem 1.5rem;
   z-index: 100;
-  box-shadow: 10px 0 40px hsla(210, 40%, 96%, 0.5);
+  box-shadow: 10px 0 40px hsla(0, 0%, 0%, 0.05);
+  transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.closeBtn {
+  display: none;
+  position: absolute;
+  right: 1.5rem;
+  top: 2rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  z-index: 10;
+  transition: var(--transition);
+}
+
+.closeBtn:hover {
+  color: var(--foreground);
+  transform: rotate(90deg);
+}
+
+@media (max-width: 1023.98px) {
+  .sidebar {
+    transform: translateX(-100%);
+  }
+  
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  .closeBtn {
+    display: block;
+  }
 }
 
 .logo {
@@ -90,7 +126,7 @@
 }
 
 .navLink:hover {
-  background: hsla(210, 40%, 96%, 1);
+  background: var(--primary-glow);
   color: var(--primary);
   transform: translateX(4px);
 }

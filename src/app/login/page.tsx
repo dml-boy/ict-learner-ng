@@ -12,8 +12,11 @@ function LoginForm() {
   
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [resendLoading, setResendLoading] = useState(false);
+  const [resendSuccess, setResendSuccess] = useState('');
 
   // Derive messages from searchParams
   const verified = searchParams.get('verified') === 'true';
@@ -50,6 +53,35 @@ function LoginForm() {
       }
     }
   };
+  
+  const handleResend = async () => {
+    if (!email) {
+      setError('Please enter your institutional email to resend the verification link.');
+      return;
+    }
+    
+    setResendLoading(true);
+    setResendSuccess('');
+    setError('');
+    
+    try {
+      const res = await fetch('/api/auth/resend-verification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setResendSuccess(data.message);
+      } else {
+        setError(data.error || 'Failed to dispatch verification protocol.');
+      }
+    } catch {
+      setError('System communication interrupted.');
+    } finally {
+      setResendLoading(false);
+    }
+  };
 
   return (
     <AuthCard 
@@ -72,8 +104,24 @@ function LoginForm() {
       )}
 
       {displayError && (
-        <div className="auth-message auth-message-error mb-6">
-          {displayError}
+        <div className="auth-message auth-message-error mb-6 flex flex-col gap-3">
+          <p>{displayError}</p>
+          {(urlError === 'unverified' || error === 'Please verify your email address before logging in.') && !resendSuccess && (
+            <button 
+              type="button" 
+              onClick={handleResend} 
+              disabled={resendLoading}
+              className="text-xs font-black uppercase tracking-widest text-emerald-950 hover:underline text-left"
+            >
+              {resendLoading ? 'Re-dispatching...' : 'Resend Verification Protocol?'}
+            </button>
+          )}
+        </div>
+      )}
+
+      {resendSuccess && (
+        <div className="auth-message auth-message-success mb-6 text-sm">
+          {resendSuccess}
         </div>
       )}
 
@@ -95,15 +143,28 @@ function LoginForm() {
             <label className="auth-label mb-0">Security Password</label>
             <a href="#" className="text-xs font-black text-emerald-600 hover:text-[#044331] transition-colors uppercase tracking-widest no-underline">Reset?</a>
           </div>
-          <input 
-            type="password" 
-            className="input" 
-            placeholder="••••••••" 
-            required 
-            autoComplete="current-password"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-          />
+          <div className="relative">
+            <input 
+              type={showPassword ? 'text' : 'password'} 
+              className="input pr-12" 
+              placeholder="••••••••" 
+              required 
+              autoComplete="current-password"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+            />
+            <button 
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-emerald-600 transition-colors"
+            >
+              {showPassword ? (
+                <span className="text-xs font-black uppercase tracking-tighter">Hide</span>
+              ) : (
+                <span className="text-xs font-black uppercase tracking-tighter">Show</span>
+              )}
+            </button>
+          </div>
         </div>
 
         <button 

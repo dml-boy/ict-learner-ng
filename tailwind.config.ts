@@ -11,6 +11,20 @@ export default {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        primary: {
+          DEFAULT: "hsl(158, 94%, 30%)",
+          light: "hsl(158, 94%, 40%)",
+          glow: "hsla(158, 94%, 30%, 0.15)",
+        },
+        secondary: {
+          DEFAULT: "hsl(199, 89%, 48%)",
+          glow: "hsla(199, 89%, 48%, 0.1)",
+        },
+        accent: "hsl(38, 92%, 50%)",
+      },
+      fontFamily: {
+        main: ['Plus Jakarta Sans', 'sans-serif'],
+        heading: ['Outfit', 'sans-serif'],
       },
     },
   },

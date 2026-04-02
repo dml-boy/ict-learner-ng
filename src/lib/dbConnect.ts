@@ -4,11 +4,6 @@ import dns from 'dns';
 // Force Google DNS for SRV/TXT lookups — fixes ESERVFAIL on restricted networks with mongodb+srv://
 dns.setServers(['8.8.8.8', '8.8.4.4', '1.1.1.1']);
 
-const MONGODB_URI = process.env.MONGODB_URI;
-
-if (!MONGODB_URI) {
-  throw new Error('Please define the MONGODB_URI environment variable inside .env.local');
-}
 
 interface MongooseCache {
   conn: typeof mongoose | null;
@@ -31,13 +26,17 @@ async function dbConnect(): Promise<typeof mongoose> {
   }
 
   if (!cached.promise) {
+    const URI = process.env.MONGODB_URI;
+    if (!URI) {
+      throw new Error('Please define the MONGODB_URI environment variable inside .env.local');
+    }
     const opts = {
       bufferCommands: false,
       connectTimeoutMS: 10000,
       socketTimeoutMS: 45000,
       family: 4, // Force IPv4 — avoids SRV AAAA lookup failures on restricted networks
     };
-    cached.promise = mongoose.connect(MONGODB_URI as string, opts)
+    cached.promise = mongoose.connect(URI, opts)
       .then((mongooseInstance) => mongooseInstance)
       .catch((err) => {
         // Clear promise on failure so the next request retries

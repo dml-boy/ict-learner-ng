@@ -21,25 +21,27 @@ export default function LandingHeader() {
   }, []);
 
   return (
-    <div className="sticky top-0 mx-auto z-50 pointer-events-none">
-      <header className={`max-w-[1000px] mx-auto py-3 bg-white px-8 rounded-b-[20px] flex items-center justify-between transition-all duration-300 pointer-events-auto border-x border-b border-slate-100 ${isScrolled ? 'shadow-[0_10px_30px_rgba(0,0,0,0.08)]' : 'shadow-[0_4px_15px_rgba(0,0,0,0.04)]'}`}>
-        <Link href="/" className="flex items-center gap-3 no-underline">
-          <Image src="/logosm.svg" alt="Logo" width={34} height={31} />
-          <span className="text-[1.1rem] font-black text-[#044331] tracking-tight whitespace-nowrap uppercase">ICT LEARNER NG</span>
+    <div className="sticky top-4 mx-auto z-50 pointer-events-none px-6">
+      <header className={`max-w-[1240px] mx-auto py-4 px-10 rounded-[28px] flex items-center justify-between transition-all duration-500 pointer-events-auto glass-panel glossy-border ${isScrolled ? 'shadow-[0_25px_60px_-15px_rgba(0,0,0,0.1)] scale-[0.98]' : 'shadow-xl'}`}>
+        <Link href="/" className="flex items-center gap-4 no-underline group">
+          <div className="w-10 h-10 flex items-center justify-center bg-white/10 rounded-xl glossy-border group-hover:rotate-12 transition-transform duration-500">
+            <Image src="/logosm.svg" alt="Logo" width={40} height={36} className="w-7 h-7" />
+          </div>
+          <span className="text-[1.2rem] font-black gradient-text tracking-tighter whitespace-nowrap uppercase group-hover:opacity-80 transition-opacity">ICT LEARNER NG</span>
         </Link>
-        <nav className="hidden md:flex gap-8 nav-menu">
+        <nav className="hidden lg:flex gap-10 nav-menu">
           {NAV_LINKS.map(l => (
-            <Link key={l.path} href={l.path} className="no-underline text-slate-700 font-semibold text-[0.9rem] hover:text-[#044331] transition-colors">
+            <Link key={l.path} href={l.path} className="no-underline text-text-muted font-black text-[0.85rem] uppercase tracking-widest hover:text-primary hover:scale-110 transition-all duration-300">
               {l.label}
             </Link>
           ))}
         </nav>
-        <div className="flex gap-4 items-center">
-          <Link href="/login" className="hidden md:inline-block border-[2px] border-[#044331] text-[#044331] py-2 px-6 rounded-full font-bold text-[0.95rem] transition-all hover:bg-[#044331] hover:text-white">
+        <div className="flex gap-6 items-center">
+          <Link href="/login" className="hidden md:inline-block font-black text-[0.9rem] text-foreground uppercase tracking-widest hover:text-primary transition-colors">
             Login
           </Link>
-          <Link href="/register/student" className="inline-block bg-[#044331] text-white py-2 px-6 rounded-full font-bold text-[0.95rem] transition-all shadow-[0_4px_10px_rgba(4,67,49,0.15)] hover:-translate-y-px hover:shadow-[0_6px_15px_rgba(4,67,49,0.2)] hover:opacity-90">
-            Signup 
+          <Link href="/register/student" className="btn btn-primary px-8 py-3 rounded-2xl text-[0.9rem] font-black uppercase tracking-widest shadow-xl hover:shadow-primary-glow/50">
+            Sign Up
           </Link>
         </div>
       </header>

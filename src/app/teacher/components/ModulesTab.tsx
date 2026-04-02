@@ -152,18 +152,20 @@ export default function ModulesTab({ modules, setModules, topics, subjects }: {
 
   return (
     <div className="animate-fade-in flex flex-col gap-12">
-      <div className="peak-card bg-linear-to-br from-[hsla(199,89%,48%,0.1)] to-[hsla(280,89%,48%,0.05)] border-2 border-primary-light p-12">
-        <h3 className="mb-4 text-foreground flex items-center gap-4 text-3xl font-extrabold">⚡ Dynamic 5E Synergy Engine</h3>
-        <p className="text-lg text-text-muted mb-4 max-w-3xl leading-relaxed">
+      <div className="glass-panel border-2 border-primary-light">
+        <h3 className="mb-4 text-foreground flex items-center gap-4 fluid-text-h2 font-black">⚡ Dynamic 5E Synergy Engine</h3>
+        <p className="text-base md:text-lg text-text-muted mb-4 max-w-3xl leading-relaxed">
           You no longer need to manually construct the 5E phases! 
           Just define the core, raw syllabus content here or <strong>upload a PDF lesson plan</strong>. When your students start the lesson, our Gemini AI will dynamically synthesize a fully personalized 5E curriculum on-the-fly, meticulously mapped to their distinct contextual role and background.
         </p>
       </div>
 
-      <form onSubmit={handleAddModule} className="peak-card">
-        <h3 className="mb-8 font-extrabold"><span className="text-primary">🛠️</span> Module Foundation Constructor</h3>
+      <form onSubmit={handleAddModule} className="glass-panel">
+        <h3 className="mb-8 font-black flex items-center gap-2 fluid-text-h2">
+          <span className="text-primary text-2xl">🛠️</span> Module Foundation Constructor
+        </h3>
         
-        <div className="flex gap-6 mb-6">
+        <div className="flex flex-col md:flex-row gap-6 mb-6">
           <div className="flex-[2]">
             <label className="auth-label">Parent Topic Block</label>
             <select value={modTopicId} onChange={e => setModTopicId(e.target.value)} className="input" required>
@@ -230,21 +232,21 @@ export default function ModulesTab({ modules, setModules, topics, subjects }: {
             {isSynthesizing ? 'Brainstorming with Gemini...' : '✨ Synthesize AI Foundation'}
           </button>
         ) : (
-          <div className="animate-fade-in mt-8 p-8 bg-[rgba(255,255,255,0.03)] rounded-md border border-primary-glow">
-            <div className="flex justify-between items-center mb-8">
-              <h4 className="text-primary m-0 flex items-center gap-2 font-extrabold">
-                <span>✨</span> AI Synthesis: Active Review & Refinement
+          <div className="animate-fade-in mt-8 p-4 sm:p-8 bg-[rgba(255,255,255,0.03)] rounded-md border border-primary-glow">
+            <div className="flex flex-col lg:flex-row justify-between lg:items-center gap-6 mb-8">
+              <h4 className="text-primary m-0 flex items-center gap-2 font-extrabold text-xl">
+                <span>✨</span> AI Synthesis: Active Review
               </h4>
-              <div className="flex items-center gap-4">
+              <div className="flex flex-col sm:flex-row items-center gap-4">
                 <button 
                   type="button" 
                   onClick={handleRegenerate} 
                   disabled={isRegenerating}
-                  className="text-[0.7rem] bg-secondary/10 text-secondary border border-secondary/20 px-3 py-1 rounded-full hover:bg-secondary/20 transition-all font-bold"
+                  className="text-[0.7rem] bg-secondary/10 text-secondary border border-secondary/20 px-3 py-2 rounded-full hover:bg-secondary/20 transition-all font-bold w-full sm:w-auto"
                 >
                   {isRegenerating ? '🔄 Regenerating...' : '🔄 Full Regeneration'}
                 </button>
-                <div className="tag-nigeria text-[0.7rem]">Constructivist Guardrails Active</div>
+                <div className="tag-nigeria text-[0.7rem] w-full sm:w-auto text-center">Guardrails Active</div>
               </div>
             </div>
             
@@ -262,7 +264,7 @@ export default function ModulesTab({ modules, setModules, topics, subjects }: {
                 { key: 'explain', label: '3. EXPLAIN (Theoretical Foundation)', icon: '📖', placeholder: 'Formal definitions and theoretical core...' },
                 { key: 'evaluate', label: '5. EVALUATE (Reflection Question)', icon: '🤔', placeholder: 'Final metacognitive reflection question...' }
               ].map(phase => (
-                <div key={phase.key} className="peak-card bg-[rgba(255,255,255,0.01)] border-l-4 border-primary">
+                <div key={phase.key} className="glass-panel border-l-4 border-primary">
                   <div className="flex items-center gap-2 mb-4">
                     <span className="text-xl">{phase.icon}</span>
                     <label className="auth-label text-[0.8rem] uppercase font-black text-primary m-0">{phase.label}</label>
@@ -276,7 +278,7 @@ export default function ModulesTab({ modules, setModules, topics, subjects }: {
                 </div>
               ))}
               
-              <div className="peak-card bg-[rgba(255,255,255,0.01)] border-l-4 border-secondary">
+              <div className="glass-panel border-l-4 border-secondary">
                 <div className="flex items-center gap-2 mb-6">
                   <span className="text-xl">🛠️</span>
                   <label className="auth-label text-[0.8rem] uppercase font-black text-secondary m-0">4. ELABORATE (Contextual & Personal Tie-back)</label>
@@ -310,7 +312,7 @@ export default function ModulesTab({ modules, setModules, topics, subjects }: {
               
               <div className="grid grid-cols-1 gap-6">
                 {aiGeneratedData.questions?.map((q: Question, i: number) => (
-                  <div key={i} className="peak-card bg-[rgba(255,255,255,0.02)] border border-dashed border-primary-glow/30 hover:border-primary-glow transition-all">
+              <div key={i} className="glass-panel border border-dashed border-primary-glow/30 hover:border-primary-glow transition-all">
                     <div className="mb-6">
                       <div className="flex justify-between items-center mb-3">
                         <label className="auth-label text-[0.7rem] font-black text-primary uppercase m-0 flex items-center gap-2">
@@ -370,23 +372,23 @@ export default function ModulesTab({ modules, setModules, topics, subjects }: {
               </div>
             </div>
 
-            <div className="flex gap-6 mt-12 pt-8 border-t border-border">
-              <button type="submit" className="btn btn-primary flex-[2] p-4 text-[1.1rem] bg-linear-to-br from-primary to-secondary shadow-[0_10px_20px_-5px_var(--primary-glow)]">🚀 Deploy Full High-Fidelity Package</button>
-              <button type="button" onClick={() => setAiGeneratedData(null)} className="btn btn-outline flex-1 p-4">✖ Discard Blueprint</button>
+            <div className="flex flex-col sm:flex-row gap-6 mt-12 pt-8 border-t border-border">
+              <button type="submit" className="btn btn-primary flex-[2] p-4 text-[1.1rem] bg-linear-to-br from-primary to-secondary shadow-[0_10px_20px_-5px_var(--primary-glow)]">🚀 Deploy Full Package</button>
+              <button type="button" onClick={() => setAiGeneratedData(null)} className="btn btn-outline flex-1 p-4">✖ Discard</button>
             </div>
           </div>
         )}
       </form>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="dashboard-grid">
         {modules.length === 0 ? (
-          <div className="peak-card text-center text-text-muted col-span-full py-20 border-dashed">
+          <div className="glass-panel text-center text-text-muted col-span-full py-20 border-dashed">
             <span className="text-4xl mb-4 block">📭</span>
             No foundational blueprints currently deployed. Start by synthesizing a new module above.
           </div>
         ) : (
           modules.map(mod => (
-            <div key={mod._id} className="peak-card group flex flex-col h-full bg-linear-to-b from-[rgba(255,255,255,0.03)] to-transparent border-white/5 hover:border-primary-glow/50 transition-all duration-500 hover:-translate-y-1 relative overflow-hidden">
+            <div key={mod._id} className="glass-panel group flex flex-col h-full bg-linear-to-b from-[hsla(0,0%,100%,0.03)] to-transparent border-white/5 hover:border-primary-glow/50 transition-all duration-500 hover:-translate-y-1 relative overflow-hidden">
               {/* Animated Accent */}
               <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-primary via-secondary to-primary opacity-30 group-hover:opacity-100 transition-opacity" />
               

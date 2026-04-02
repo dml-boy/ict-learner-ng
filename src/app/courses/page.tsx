@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import LandingHeader from '@/components/LandingHeader';
 import LandingFooter from '@/components/LandingFooter';
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface Subject {
   _id: string;
@@ -81,10 +82,19 @@ export default function CoursesPage() {
                   style={{ transitionDelay: `${i * 0.1}s` }}
                 >
                   <div 
-                    className="w-24 h-24 rounded-[28px] flex items-center justify-center text-5xl mb-8 transition-transform group-hover:scale-110 duration-500"
+                    className="w-24 h-24 rounded-[28px] flex items-center justify-center text-5xl mb-8 transition-transform group-hover:scale-110 duration-500 overflow-hidden relative"
                     style={{ backgroundColor: `${subject.color}15`, color: subject.color }}
                   >
-                    {subject.icon}
+                    {subject.icon?.startsWith('http') ? (
+                      <Image 
+                        src={subject.icon} 
+                        alt={subject.title} 
+                        fill 
+                        className="object-cover"
+                      />
+                    ) : (
+                      subject.icon
+                    )}
                   </div>
                   <h3 className="text-2xl font-black mb-4 group-hover:text-emerald-600 transition-colors uppercase tracking-tight">{subject.title}</h3>
                   <div className="h-1 w-12 bg-emerald-200 mb-6 group-hover:w-24 transition-all duration-500 rounded-full"></div>

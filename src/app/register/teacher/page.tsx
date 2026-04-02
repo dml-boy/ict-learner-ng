@@ -8,6 +8,7 @@ export default function TeacherRegister() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
@@ -102,15 +103,28 @@ export default function TeacherRegister() {
         </div>
         <div>
           <label className="auth-label">Security Password</label>
-          <input 
-            type="password" 
-            className="input" 
-            placeholder="••••••••" 
-            required 
-            autoComplete="new-password"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-          />
+          <div className="relative">
+            <input 
+              type={showPassword ? 'text' : 'password'} 
+              className="input pr-12" 
+              placeholder="••••••••" 
+              required 
+              autoComplete="new-password"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+            />
+            <button 
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-emerald-600 transition-colors"
+            >
+              {showPassword ? (
+                <span className="text-xs font-black uppercase tracking-tighter">Hide</span>
+              ) : (
+                <span className="text-xs font-black uppercase tracking-tighter">Show</span>
+              )}
+            </button>
+          </div>
         </div>
 
         {error && (

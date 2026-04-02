@@ -12,11 +12,22 @@ const NAV_ITEMS = [
   { href: '/student/achievements', label: 'Achievements', icon: '🏆' },
 ];
 
-export default function Sidebar() {
+export default function Sidebar({ isOpen, setIsOpen }: { 
+  isOpen: boolean, 
+  setIsOpen: (open: boolean) => void 
+}) {
   const pathname = usePathname();
 
   return (
-    <aside className={styles.sidebar}>
+    <aside className={`${styles.sidebar} ${isOpen ? styles.open : ''}`}>
+      <button 
+        className={styles.closeBtn} 
+        onClick={() => setIsOpen(false)}
+        aria-label="Close Menu"
+      >
+        ✕
+      </button>
+
       <div className={styles.logo}>
         <div className={styles.logoIcon}>
           <Image src="/logosm.svg" alt="ICT Learner NG" width={32} height={32} />

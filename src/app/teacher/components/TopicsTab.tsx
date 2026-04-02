@@ -33,8 +33,10 @@ export default function TopicsTab({ topics, setTopics, subjects }: {
 
   return (
     <div className="animate-fade-in flex flex-col gap-12">
-      <form onSubmit={handleAddTopic} className="peak-card border-l-8 border-secondary">
-        <h3 className="mb-8 font-extrabold flex items-center gap-2"><span className="text-secondary text-2xl">📚</span> Define New Topic Cluster</h3>
+      <form onSubmit={handleAddTopic} className="glass-panel border-l-8 border-secondary">
+        <h3 className="mb-8 font-black flex items-center gap-2 fluid-text-h2">
+          <span className="text-secondary">📚</span> Define New Topic Cluster
+        </h3>
         
         <div className="flex flex-col md:flex-row gap-6 mb-6">
           <div className="flex-1">
@@ -78,25 +80,25 @@ export default function TopicsTab({ topics, setTopics, subjects }: {
 
       <div className="dashboard-grid">
         {topics.length === 0 ? (
-          <div className="peak-card text-center text-text-muted col-span-full py-12">
+          <div className="glass-panel text-center text-text-muted col-span-full py-12">
             No topic clusters are currently registered within your academic sectors.
           </div>
         ) : (
           topics.map((topic: Topic) => (
-            <div key={topic._id} className="peak-card flex flex-col h-full border-l-4 border-secondary/30 hover:border-secondary transition-all">
-              <div className="flex justify-between items-start mb-6">
+            <div key={topic._id} className="glass-panel flex flex-col h-full border-l-4 border-secondary/30 hover:border-secondary transition-all p-5 sm:p-8">
+              <div className="flex justify-between items-start mb-4 md:mb-6">
                 <div>
-                  <h4 className="text-xl font-black mb-2">{topic.title}</h4>
-                  <div className="flex items-center gap-2">
-                    <span className="tag-nigeria bg-secondary/10 text-secondary border-secondary/20 text-[0.65rem]">{topic.category}</span>
-                    <span className="text-[0.65rem] text-text-muted font-bold uppercase tracking-widest px-2 py-0.5 bg-gray-100 rounded-full">
-                      ID: {typeof topic.subjectId === 'object' ? (topic.subjectId as Subject).icon : '📂'}
+                  <h4 className="text-lg md:text-xl font-black mb-2 leading-tight">{topic.title}</h4>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="tag-nigeria bg-secondary/10 text-secondary border-secondary/20 text-[0.6rem] md:text-[0.65rem]">{topic.category}</span>
+                    <span className="text-[0.6rem] md:text-[0.65rem] text-text-muted font-bold uppercase tracking-widest px-2 py-0.5 bg-gray-100 rounded-full">
+                      ID: {typeof topic.subjectId === 'object' ? (topic.subjectId as Subject).icon?.substring(0, 2) || '📂' : '📂'}
                     </span>
                   </div>
                 </div>
-                <button onClick={() => handleDeleteTopic(topic._id)} className="text-[#ef4444] bg-none border-none cursor-pointer text-xl hover:scale-125 transition-transform">✕</button>
+                <button onClick={() => handleDeleteTopic(topic._id)} className="w-8 h-8 flex items-center justify-center rounded-full bg-red-50 text-[#ef4444] hover:bg-red-500 hover:text-white transition-all">✕</button>
               </div>
-              <p className="text-text-muted text-sm leading-relaxed flex-1 italic">&quot;{topic.description}&quot;</p>
+              <p className="text-text-muted text-sm leading-relaxed flex-1 italic opacity-80">&quot;{topic.description}&quot;</p>
             </div>
           ))
         )}
