@@ -1,14 +1,15 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useSession, signOut } from 'next-auth/react';
+import { useSession } from 'next-auth/react';
+import Link from 'next/link';
 import LiveEditor from '@/components/LiveEditor';
-import Image from 'next/image';
-import { Module, StudentProgress } from '@/types';
+import { Module, StudentProgress, LeaderboardEntry } from '@/types';
 
 export default function StudentDashboard() {
   const [modules, setModules] = useState<Module[]>([]);
   const [progress, setProgress] = useState<StudentProgress[]>([]);
+  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([] as LeaderboardEntry[]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const { data: session } = useSession();
@@ -16,20 +17,35 @@ export default function StudentDashboard() {
   const userName = session?.user?.name || 'Learner';
 
   useEffect(() => {
-    if (userId === 'guest') return;
-    setLoading(true);
+    let isMounted = true;
+    
+    if (userId === 'guest') {
+      // Defer to avoid synchronous setState warning in effect
+      Promise.resolve().then(() => {
+        if (isMounted) setLoading(false);
+      });
+      return;
+    }
+    
     Promise.all([
       fetch('/api/modules').then((res) => res.json()),
-      fetch(`/api/progress?userId=${userId}`).then((res) => res.json())
+      fetch(`/api/progress?userId=${userId}`).then((res) => res.json()),
+      fetch('/api/leaderboard').then((res) => res.json())
     ])
-      .then(([modulesData, progressData]) => {
+      .then(([modulesData, progressData, leaderboardData]) => {
+        if (!isMounted) return;
         if (modulesData.success) setModules(modulesData.data);
         if (progressData.success) setProgress(progressData.data);
+        if (leaderboardData.success) setLeaderboard(leaderboardData.data);
       })
       .catch((err) => {
         console.error('[Student Dashboard] Neural uplink failure:', err);
       })
-      .finally(() => setLoading(false));
+      .finally(() => {
+        if (isMounted) setLoading(false);
+      });
+
+    return () => { isMounted = false; };
   }, [userId]);
 
   const getModuleStatus = (moduleId: string) => {
@@ -40,151 +56,166 @@ export default function StudentDashboard() {
     return prog?.status || 'available';
   };
 
+  const stats = [
+    { label: 'Available', value: modules.length, icon: '📂' },
+    { label: 'Mastered', value: progress.filter(p => p.status === 'completed').length, icon: '🛡️' },
+    { label: 'In Orbit', value: modules.length - progress.filter(p => p.status === 'completed').length, icon: '🚀' },
+  ];
+
+  if (loading) {
+    return (
+      <div className="flex flex-col justify-center items-center h-[60vh] gap-4">
+        <div className="w-12 h-12 border-4 border-primary-glow border-t-primary rounded-full animate-spin" />
+        <p className="text-text-muted font-bold text-[0.7rem] uppercase tracking-widest animate-pulse">Materializing your learning universe...</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="animate-fade-in pb-20">
-      {/* Hero Section */}
-      <section className="relative flex flex-col items-center justify-center text-center py-16 md:py-32 mb-16 px-6 bg-[radial-gradient(circle_at_center,var(--primary-glow)_0%,transparent_70%)] overflow-hidden">
-        <div className="animate-float mb-10 w-24 h-24 md:w-32 md:h-32 flex items-center justify-center bg-white/10 dark:bg-black/10 backdrop-blur-2xl rounded-[35%_65%_65%_35%_/_35%_35%_65%_65%] shadow-[0_25px_50px_var(--primary-glow)] border border-card-border overflow-hidden glossy-border">
-          <Image src="/logosm.svg" alt="ICT Learner NG" width={80} height={70} className="w-12 h-12 md:w-20 md:h-20" priority />
+    <div className="animate-fade-in px-4 sm:px-8 lg:px-12 pb-32">
+      {/* Welcome Header - PeerLearn Style Refinement */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 mb-12 animate-fade-in-down">
+        <div>
+          <h2 className="text-4xl sm:text-5xl font-black text-primary mb-3 tracking-tighter" style={{ lineHeight: 1.1 }}>
+            Welcome back, <span className="text-foreground">{userName}</span>
+          </h2>
+          <p className="text-text-muted font-bold text-lg opacity-80">Forge your ICT expertise through discovery.</p>
         </div>
-        <h1 className="gradient-text fluid-text-h1 mb-8 font-black leading-tight tracking-tight px-4 max-w-4xl mx-auto">
-          Welcome, {userName}
-        </h1>
-        <p className="text-text-muted text-[clamp(1.1rem,2vw+0.5rem,1.35rem)] max-w-2xl font-semibold leading-relaxed mb-12">
-          Step into your personalized constructivist learning environment. Forge your ICT expertise through active exploration and discovery.
-        </p>
-        <div className="flex flex-wrap justify-center gap-6">
-          <button onClick={() => router.push('/student/modules')} className="btn btn-primary px-12 py-4.5 shadow-[0_15px_30px_var(--primary-glow)] group text-lg">
-            Browse Courses <span className="inline-block transition-transform group-hover:translate-x-2">→</span>
-          </button>
-          <button onClick={() => signOut({ callbackUrl: '/login' })} className="btn btn-outline px-12 py-4.5 text-lg">
-            Sign Out
-          </button>
-        </div>
-      </section>
-
-      {/* Progress Overview */}
-      <div className="stat-grid mb-24 px-6 md:px-10">
-        <div className="peak-card glossy-border text-center group">
-          <h5 className="text-[0.8rem] text-text-muted uppercase tracking-[0.2em] font-black mb-4">Courses Available</h5>
-          <div className="text-6xl font-black text-foreground mb-3 group-hover:scale-110 transition-transform">{modules.length}</div>
-          <div className="text-[0.7rem] text-primary font-extrabold uppercase tracking-widest bg-primary/10 py-1.5 px-4 rounded-full inline-block">Global Curriculum</div>
-        </div>
-        <div className="peak-card glossy-border text-center group">
-          <h5 className="text-[0.8rem] text-text-muted uppercase tracking-[0.2em] font-black mb-4">Mastered</h5>
-          <div className="text-6xl font-black text-secondary mb-3 group-hover:scale-110 transition-transform">
-            {progress.filter(p => p.status === 'completed').length}
+        
+        {/* Sync Status - Filling the row */}
+        <div className="flex items-center gap-4 bg-white/50 backdrop-blur-md px-6 py-4 rounded-2xl border border-primary/5 shadow-sm">
+          <div className="relative">
+            <div className="w-3 h-3 bg-secondary rounded-full animate-pulse"></div>
+            <div className="absolute inset-0 w-3 h-3 bg-secondary rounded-full animate-ping opacity-75"></div>
           </div>
-          <div className="text-[0.7rem] text-secondary font-extrabold uppercase tracking-widest bg-secondary/10 py-1.5 px-4 rounded-full inline-block">Achievement Unlocked</div>
-        </div>
-        <div className="peak-card glossy-border text-center group">
-          <h5 className="text-[0.8rem] text-text-muted uppercase tracking-[0.2em] font-black mb-4">In Progress</h5>
-          <div className="text-6xl font-black text-primary-light mb-3 group-hover:scale-110 transition-transform">
-            {modules.length - progress.filter(p => p.status === 'completed').length}
+          <div>
+            <p className="text-[0.65rem] font-black text-text-muted uppercase tracking-widest leading-none mb-1">Neural Uplink</p>
+            <p className="text-sm font-bold text-primary">Stable & Synchronized</p>
           </div>
-          <div className="text-[0.7rem] text-primary-light font-extrabold uppercase tracking-widest bg-primary-light/10 py-1.5 px-4 rounded-full inline-block">Active Evolution</div>
         </div>
       </div>
 
-      <div className="flex flex-col md:flex-row justify-between items-center md:items-end mb-16 px-8 lg:px-12 gap-8">
-        <div className="text-center md:text-left">
-          <h3 className="fluid-text-h2 font-black mb-3 flex items-center justify-center md:justify-start gap-4">
-            <span className="text-primary animate-pulse">✦</span> My Course Catalog
-          </h3>
-          <p className="text-text-muted text-[clamp(1.1rem,1.5vw+0.5rem,1.25rem)] font-medium">Constructivist courses scaffolded for your cognitive growth.</p>
-        </div>
-        <div className="tag-nigeria px-8 py-3.5 text-[0.8rem] font-black border-2 border-primary/20 bg-primary/5">
-          NIGERIA ICT CURRICULUM v2.5
-        </div>
-      </div>
-
-      {/* Module List */}
-      <div className="dashboard-grid px-8 lg:px-12 gap-8 cursor-default">
-        {loading ? (
-          <div className="peak-card glossy-border text-center text-text-muted col-span-full py-24 flex flex-col items-center justify-center gap-8">
-            <div className="w-16 h-16 rounded-full border-[6px] border-primary-glow border-t-primary animate-spin"></div>
-            <p className="font-black tracking-[0.3em] uppercase text-xs animate-pulse">Calibrating your learning universe...</p>
-          </div>
-        ) : modules.length > 0 ? (
-          modules.map((mod) => {
-            const status = getModuleStatus(mod._id);
-            const isCompleted = status === 'completed';
-            const isInProgress = status === 'in-progress';
-
-            return (
-              <div 
-                key={mod._id} 
-                className="peak-card glossy-border flex flex-col p-10 group cursor-pointer border-t-[3px] border-transparent hover:border-primary transition-all duration-500"
-                onClick={() => router.push(`/student/learn/${mod._id}/intro`)}
-              >
-                <div className="flex justify-between items-start mb-10 translate-y-0 group-hover:-translate-y-1 transition-transform">
-                  <div className="tag-nigeria text-[0.7rem] font-black uppercase tracking-widest bg-foreground/5 text-foreground border-transparent px-4 py-1.5">
-                    {typeof mod.topicId === 'object' ? mod.topicId.title : 'ICT CORE INFRA'}
-                  </div>
-                  <div className={`text-2xl w-14 h-14 flex items-center justify-center rounded-2xl shadow-inner transition-all duration-500 ${isCompleted ? 'bg-secondary/15 rotate-[360deg]' : 'bg-primary-glow'}`}>
-                    {isCompleted ? '🛡️' : isInProgress ? '⚡' : '🔮'}
-                  </div>
+      <div className="main-content-layout">
+        <div className="flex flex-col gap-12">
+          {/* Progress Overview Grid */}
+          <div className="stat-grid animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+            {stats.map((stat, i) => (
+              <div key={i} className="peak-card p-8 hover:shadow-xl group flex flex-col items-center text-center glossy-border">
+                <div className="w-14 h-14 rounded-2xl bg-primary/5 flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-all duration-500 group-hover:rotate-6">
+                  {stat.icon}
                 </div>
-                
-                <h4 className="text-2xl font-black mb-5 text-foreground group-hover:text-primary transition-colors leading-tight tracking-tight">
-                  {mod.title}
-                </h4>
-                
-                <p className="text-[0.95rem] text-text-muted mb-10 italic leading-relaxed flex-1 opacity-75 group-hover:opacity-100 transition-opacity line-clamp-3">
-                  &quot;{mod.content.substring(0, 140)}{mod.content.length > 140 ? '...' : ''}&quot;
-                </p>
-                
-                <div className="flex justify-between items-center mt-auto pt-8 border-t border-white/10 dark:border-white/5">
-                  <div className="flex flex-col">
-                    <span className="text-[0.65rem] text-text-muted uppercase font-black tracking-[0.2em] mb-1.5 opacity-60">Sector Status</span>
-                    <span className={`text-[0.95rem] font-black tracking-tight ${isCompleted ? 'text-secondary' : isInProgress ? 'text-primary' : 'text-text-muted opacity-50'}`}>
-                      {isCompleted ? 'MASTERY ACHIEVED' : isInProgress ? 'ACTIVE UPLINK' : 'READY FOR INIT'}
-                    </span>
-                  </div>
-                  <button 
-                    className={`btn text-[0.85rem] px-6 py-3 font-black border-2 transition-all duration-300 ${isCompleted ? 'border-secondary/30 text-secondary hover:bg-secondary/10' : 'btn-primary border-transparent shadow-xl hover:shadow-primary-glow/50'}`}
-                    onClick={e => { e.stopPropagation(); router.push(`/student/learn/${mod._id}/intro`); }}
-                  >
-                    {isCompleted ? 'Review Core' : isInProgress ? 'Resume Lab' : 'Initialize'}
-                  </button>
-                </div>
+                <h3 className="text-4xl font-black text-foreground mb-2 tracking-tighter tabular-nums">{stat.value}</h3>
+                <p className="text-[0.7rem] font-black text-text-muted uppercase tracking-[0.2em] opacity-60 leading-none">{stat.label}</p>
               </div>
-            );
-          })
-        ) : (
-          <div className="peak-card glossy-border text-center text-text-muted col-span-full py-24">
-            <p className="text-2xl font-black mb-8 tracking-tight">No courses broadcasted from the central server yet. 🛰️</p>
-            <button className="btn btn-outline px-10" onClick={() => window.location.reload()}>Refresh Uplink</button>
+            ))}
           </div>
-        )}
-      </div>
 
-      {/* Quick Lab Section */}
-      <section className="peak-card glossy-border mx-6 md:mx-12 mt-24 md:mt-40 p-8 md:p-20 bg-gradient-to-br from-secondary/5 via-primary/5 to-transparent border-primary/15 relative overflow-hidden group">
-        <div className="absolute -right-32 -top-32 w-80 h-80 bg-secondary/10 rounded-full blur-[100px] group-hover:bg-secondary/20 transition-all duration-1000"></div>
-        <div className="absolute -left-32 -bottom-32 w-80 h-80 bg-primary/10 rounded-full blur-[100px] group-hover:bg-primary/20 transition-all duration-1000"></div>
-        
-        <div className="flex flex-col md:flex-row items-center gap-8 md:gap-14 mb-16 relative z-10">
-          <div className="text-5xl md:text-6xl bg-white dark:bg-zinc-900 w-24 h-24 md:w-32 md:h-32 flex items-center justify-center rounded-[2.5rem] shadow-2xl shadow-secondary/20 group-hover:scale-110 group-hover:rotate-6 transition-all duration-700 shrink-0 glossy-border">🧪</div>
-          <div className="text-center md:text-left transition-all duration-500 group-hover:translate-x-2">
-            <h3 className="text-3xl md:text-5xl font-black mb-4 tracking-tighter">The Constructivist Sandbox</h3>
-            <p className="text-text-muted text-lg md:text-xl max-w-2xl font-medium leading-relaxed">Test your theories, build reactive components, and experiment in a high-fidelity environment designed for technical mastery.</p>
+          <div className="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+            <div>
+              <h3 className="text-2xl font-black text-primary flex items-center gap-4">
+                <span className="w-10 h-1 bg-primary rounded-full"></span>
+                Course Catalog
+              </h3>
+              <p className="text-text-muted font-medium ml-14">Scaffolded modules for cognitive growth.</p>
+            </div>
+          </div>
+
+          {/* Module List Grid */}
+          <div className="dashboard-grid animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
+            {modules.map((mod) => {
+              const status = getModuleStatus(mod._id);
+              const isCompleted = status === 'completed';
+              const isInProgress = status === 'in-progress';
+
+              return (
+                <div 
+                  key={mod._id} 
+                  className="peak-card flex flex-col p-10 group cursor-pointer hover:shadow-2xl transition-all duration-700 hover:-translate-y-3 glossy-border"
+                  onClick={() => router.push(`/student/learn/${mod._id}/intro`)}
+                >
+                  <div className="flex justify-between items-start mb-10">
+                    <div className="tag-nigeria text-[0.7rem] font-black uppercase tracking-widest">
+                      {typeof mod.topicId === 'object' ? mod.topicId.title.substring(0, 15) : 'CORE ICT'}
+                    </div>
+                    <div className={`text-2xl w-14 h-14 flex items-center justify-center rounded-2xl transition-all duration-700 ${isCompleted ? 'bg-secondary/10 rotate-[360deg]' : 'bg-primary-glow group-hover:bg-primary/20'}`}>
+                      {isCompleted ? '🛡️' : isInProgress ? '⚡' : '🔮'}
+                    </div>
+                  </div>
+                  <h4 className="text-2xl font-black mb-4 text-foreground group-hover:text-primary transition-colors leading-tight tracking-tight">
+                    {mod.title}
+                  </h4>
+                  <p className="text-sm text-text-muted mb-10 italic leading-relaxed flex-1 opacity-80 line-clamp-2">
+                     &quot;{mod.content.substring(0, 100)}...&quot;
+                  </p>
+                  <div className="flex justify-between items-center mt-auto pt-8 border-t border-primary/5">
+                    <div className="flex flex-col">
+                      <span className={`text-[0.65rem] font-black tracking-[0.2em] uppercase ${isCompleted ? 'text-secondary' : isInProgress ? 'text-primary' : 'text-text-muted opacity-40'}`}>
+                        {isCompleted ? 'MASTERY' : isInProgress ? 'UPLINK' : 'READY'}
+                      </span>
+                      <span className="text-[0.6rem] font-bold text-text-muted/40 mt-1 uppercase">Phase 1.0</span>
+                    </div>
+                    <button className="btn btn-primary text-[0.75rem] px-6 py-3 rounded-xl shadow-lg group-hover:scale-105 transition-transform">
+                      {isCompleted ? 'Review' : 'Start'}
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
-        
-        <div className="relative z-10 shadow-[0_40px_100px_rgba(0,0,0,0.3)] rounded-[2rem] overflow-hidden border border-white/20 ring-[12px] ring-black/5 dark:ring-white/5 transition-transform duration-700 hover:scale-[1.01]">
-          <div className="hidden lg:block">
-            <LiveEditor />
-          </div>
-          <div className="lg:hidden p-16 md:p-24 text-center bg-background/60 backdrop-blur-3xl">
-            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-8 border border-primary/20">
-              <span className="text-2xl animate-pulse">💻</span>
+
+        {/* Insights Column */}
+        <aside className="insights-panel animate-fade-in-right" style={{ animationDelay: '0.4s' }}>
+          <div className="peak-card p-8 bg-card-bg border-none shadow-none mb-8">
+            <h4 className="text-lg font-black mb-6 flex items-center gap-3 text-primary">
+              <span className="text-2xl">👥</span> Top Learners
+            </h4>
+            <div className="flex flex-col gap-6">
+              {leaderboard.length === 0 ? (
+                <p className="text-text-muted text-sm italic font-medium">No activity detected yet. Be the first to initiate an uplink!</p>
+              ) : (
+                leaderboard.slice(0, 3).map((learner, i) => (
+                  <div key={i} className="flex gap-4 items-start group">
+                    <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center font-black text-primary text-sm shadow-sm transition-transform group-hover:scale-110 shrink-0">
+                      {learner.name ? learner.name[0] : 'A'}
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-foreground">
+                        {learner.name || 'Anonymous Learner'} 
+                        <span className="font-medium text-text-muted text-xs block mt-0.5">
+                          mastered {learner.totalCompleted} modules
+                        </span>
+                      </p>
+                      <p className="text-[0.7rem] text-text-muted font-black opacity-50 uppercase tracking-wider mt-1">
+                        {learner.completionRate > 0 ? `${Math.round(learner.completionRate)}% Sync Rate` : 'Initializing'}
+                      </p>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
-            <p className="text-[0.7rem] font-black uppercase tracking-[0.4em] text-primary mb-6 animate-pulse">Neural Environment Constraint</p>
-            <h4 className="text-2xl md:text-3xl font-black mb-6 tracking-tight">Desktop Interface Required</h4>
-            <p className="text-base md:text-lg text-text-muted italic mb-10 max-w-md mx-auto leading-relaxed font-medium">The Constructivist Sandbox requires a multi-dimensional desktop terminal for complex code articulation and real-time synthesis.</p>
-            <div className="tag-nigeria inline-block px-8 py-3 border-2 border-primary/30">Switch to Desktop terminal</div>
+            <Link href="/student/achievements" className="btn btn-outline w-full mt-8 text-[0.7rem] py-3 border-primary/10 hover:bg-primary hover:text-white hover:border-primary transition-all">🏆 View Full Leaderboard</Link>
           </div>
+        </aside>
+      </div>
+
+      {/* Constructivist Sandbox — Tablet + Desktop */}
+      <section className="peak-card mx-0 mt-20 p-8 md:p-16 bg-white border-none shadow-sm hover:shadow-xl transition-all relative overflow-hidden group">
+        <div className="flex flex-col md:flex-row items-center gap-8 mb-10">
+          <div className="text-6xl bg-card-bg w-24 h-24 flex items-center justify-center rounded-[2rem] shadow-sm group-hover:scale-110 group-hover:rotate-3 transition-all duration-700">🧪</div>
+          <div>
+            <h3 className="text-2xl md:text-4xl font-black mb-3 tracking-tighter text-primary">The Constructivist Sandbox</h3>
+            <p className="text-text-muted text-base md:text-lg max-w-2xl font-medium leading-relaxed">Experiment live — write HTML, CSS & JS and see results instantly.</p>
+          </div>
+        </div>
+        {/* Show on tablet (md) and desktop — hidden only on mobile */}
+        <div className="hidden md:block rounded-3xl overflow-hidden border border-card-border shadow-lg">
+          <LiveEditor />
+        </div>
+        <div className="md:hidden p-12 text-center bg-background rounded-2xl border border-card-border">
+          <p className="text-[0.7rem] font-black uppercase tracking-[0.3em] text-primary mb-4 animate-pulse">Tablet / Desktop Required</p>
+          <h4 className="text-xl font-black mb-3">Open on a larger screen</h4>
+          <p className="text-text-muted text-sm font-medium">The live code editor needs at least a tablet-size screen to function properly.</p>
         </div>
       </section>
     </div>

@@ -1,7 +1,7 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Sidebar from './Sidebar';
 import Navbar from './Navbar';
 import Providers from './Providers';
@@ -9,15 +9,25 @@ import Providers from './Providers';
 export default function LayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const prevPathname = useRef(pathname);
 
-  // Close sidebar on pathname change (mobile navigation)
+  // Only close sidebar when pathname actually CHANGES (not on initial render)
   useEffect(() => {
-    if (sidebarOpen) {
-      // Use setTimeout to avoid synchronous setState during effect to prevent cascading renders
-      const timer = setTimeout(() => setSidebarOpen(false), 0);
-      return () => clearTimeout(timer);
+    if (prevPathname.current !== pathname) {
+      prevPathname.current = pathname;
+      setSidebarOpen(false);
     }
-  }, [pathname, sidebarOpen]);
+  }, [pathname]);
+
+  useEffect(() => {
+    // Prevent body scroll when sidebar is open on mobile
+    if (sidebarOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [sidebarOpen]);
 
   useEffect(() => {
     // Global Scroll Reveal Observer
@@ -34,8 +44,6 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
     };
 
     observerTarget();
-    
-    // Re-run on pathname change to catch new elements
     const timeoutId = setTimeout(observerTarget, 100);
 
     return () => {
@@ -44,7 +52,6 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
     };
   }, [pathname]);
   
-  // Public routes that don't need sidebar/navbar
   const isPublicRoute = pathname === '/' || 
                         pathname.startsWith('/about') || 
                         pathname.startsWith('/contact') || 
@@ -56,7 +63,7 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
   if (isPublicRoute) {
     return (
       <Providers>
-        <main style={{ minHeight: '100vh' }}>
+        <main className="min-h-screen bg-background overflow-x-hidden">
           {children}
         </main>
       </Providers>
@@ -67,17 +74,21 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
     <Providers>
       <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
       
-      {/* Mobile Backdrop */}
+      {/* Mobile/Tablet Backdrop — sits ABOVE content but BELOW sidebar */}
       {sidebarOpen && (
         <div 
-          className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 lg:hidden animate-fade-in"
+          className="fixed inset-0 bg-black/50 z-[90] lg:hidden"
+          style={{ backdropFilter: 'blur(2px)' }}
           onClick={() => setSidebarOpen(false)}
+          aria-label="Close menu"
         />
       )}
 
-      <div className="min-h-screen flex flex-col bg-background transition-all duration-300 lg:ml-[280px]">
-        <Navbar toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
-        <main className="flex-1 mt-[70px] lg:mt-[90px] p-4 sm:p-8 lg:p-16 animate-fade-in">
+      <div className="min-h-screen flex flex-col bg-background lg:ml-[280px] overflow-x-hidden">
+        <Navbar 
+          toggleSidebar={() => setSidebarOpen(prev => !prev)} 
+        />
+        <main className="flex-1 mt-[70px] lg:mt-[90px] p-4 sm:p-8 lg:p-10 animate-fade-in relative">
           {children}
         </main>
       </div>

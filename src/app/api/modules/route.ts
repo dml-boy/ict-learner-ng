@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import dbConnect from '@/lib/dbConnect';
 import Module from '@/models/Module';
-import '@/models/User'; // For populate
+import '@/models/Topic'; // Explicit registration for populate
+import '@/models/User';  // Explicit registration for populate
 
 // GET all modules (optionally filtered by topicId or teacherId)
 export async function GET(request: NextRequest) {

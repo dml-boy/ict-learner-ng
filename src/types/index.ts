@@ -58,3 +58,12 @@ export interface StudentProgress {
   lastAccessed: string;
 }
 
+export interface LeaderboardEntry {
+  userId: string;
+  name: string;
+  totalCompleted: number;
+  totalScore: number;
+  totalModules: number;
+  completionRate: number;
+}
+

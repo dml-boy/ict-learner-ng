@@ -4,57 +4,82 @@
 
 @layer base {
   :root {
-    --primary: hsl(158, 94%, 30%);
-    --primary-light: hsl(158, 94%, 40%);
-    --primary-glow: hsla(158, 94%, 30%, 0.15);
+    /* PeerLearn High-Fidelity Green Palette */
+    --primary: #024d3c;
+    --primary-light: #036d55;
+    --primary-glow: rgba(2, 77, 60, 0.1);
     
-    --secondary: hsl(199, 89%, 48%);
-    --secondary-glow: hsla(199, 89%, 48%, 0.1);
+    --secondary: #1a73e8; /* Keep PeerLearn Blue for accents */
+    --secondary-glow: rgba(26, 115, 232, 0.1);
     
-    /* Light Mode */
-    --background: hsl(210, 40%, 98%);
-    --foreground: hsl(222, 47%, 11%);
-    --card-bg: hsla(0, 0%, 100%, 0.75);
-    --card-border: hsla(0, 0%, 100%, 0.9);
-    --card-shadow: 0 12px 40px -10px rgba(31, 38, 135, 0.1);
-    --glass-highlight: inset 0 1px 1px hsla(0, 0%, 100%, 0.9);
-    --glass-reflection: linear-gradient(135deg, hsla(0, 0%, 100%, 0.4) 0%, transparent 50%);
-    --text-muted: hsl(215, 16%, 47%);
+    --background: #f2faf4;
+    --foreground: #1f1f1f;
+    --card-bg: #e6f5f0;
+    --card-border: rgba(0, 0, 0, 0.05);
+    --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    --glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    --glass-reflection: linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, transparent 40%);
+    --text-muted: #6b6b6b;
     
-    --bg-mesh-1: hsla(158, 94%, 30%, 0.1);
-    --bg-mesh-2: hsla(199, 89%, 48%, 0.1);
-    --bg-mesh-3: hsla(38, 92%, 50%, 0.05);
+    --bg-mesh-1: rgba(2, 77, 60, 0.05);
+    --bg-mesh-2: rgba(26, 115, 232, 0.05);
+    --bg-mesh-3: rgba(194, 242, 217, 0.3);
     
-    --spacing-xs: clamp(0.5rem, 1vw, 0.75rem);
-    --spacing-sm: clamp(1rem, 2vw, 1.5rem);
-    --spacing-md: clamp(1.5rem, 4vw, 2.5rem);
-    --spacing-lg: clamp(2.5rem, 8vw, 5rem);
-    --spacing-xl: clamp(4rem, 12vw, 8rem);
+    --spacing-xs: 0.5rem;
+    --spacing-sm: 1rem;
+    --spacing-md: 2rem;
+    --spacing-lg: 4rem;
+    --spacing-xl: 6rem;
 
-    --radius-sm: 14px;
-    --radius-md: 24px;
-    --radius-lg: 36px;
+    --radius-sm: 12px;
+    --radius-md: 20px;
+    --radius-lg: 32px;
     --transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --background: hsl(222, 47%, 6%);
-      --foreground: hsl(210, 40%, 98%);
-      --card-bg: hsla(222, 47%, 12%, 0.6);
-      --card-border: hsla(0, 0%, 100%, 0.08);
-      --card-shadow: 0 15px 45px -12px rgba(0, 0, 0, 0.6);
-      --glass-highlight: inset 0 1px 0 hsla(0, 0%, 100%, 0.08);
-      --glass-reflection: linear-gradient(135deg, hsla(0, 0%, 100%, 0.1) 0%, transparent 50%);
-      --text-muted: hsl(215, 16%, 67%);
-      
-      --bg-mesh-1: hsla(158, 94%, 35%, 0.15); 
-      --bg-mesh-2: hsla(199, 89%, 55%, 0.15); 
-      --bg-mesh-3: hsla(38, 92%, 55%, 0.08);  
-    }
+  /* Dark mode disabled per user request to 'leave it out for now' */
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    transition: background-color 0.4s ease, color 0.4s ease;
   }
 
-  /* ... unchanged animations and scrollbar ... */
+  /* Core Entry Animations */
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeInRight {
+    from { opacity: 0; transform: translateX(30px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  @keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes scaleIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  .animate-fade-in-up {
+    animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .animate-fade-in-right {
+    animation: fadeInRight 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .animate-fade-in-down {
+    animation: fadeInDown 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .animate-scale-in {
+    animation: scaleIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
 }
 
 @layer components {
@@ -305,6 +330,34 @@
     grid-template-columns: repeat(auto-fit, minmax(clamp(280px, 30vw, 400px), 1fr));
     gap: clamp(1rem, 3vw, 2.5rem);
     width: 100%;
+  }
+
+  .main-content-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+    width: 100%;
+  }
+
+  @media (min-width: 1280px) {
+    .main-content-layout {
+      grid-template-columns: 1fr 340px;
+    }
+  }
+
+  .insights-panel {
+    display: none;
+    position: sticky;
+    top: calc(90px + var(--spacing-md));
+    height: fit-content;
+  }
+
+  @media (min-width: 1280px) {
+    .insights-panel {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-md);
+    }
   }
 
   .stat-grid {

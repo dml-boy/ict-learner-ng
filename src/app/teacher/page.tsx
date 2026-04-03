@@ -6,6 +6,7 @@ import SubjectsTab from './components/SubjectsTab';
 import TopicsTab from './components/TopicsTab';
 import ModulesTab from './components/ModulesTab';
 import { Subject, Topic, Module } from '@/types';
+import { Zap, Plus, FolderPlus, BellRing } from 'lucide-react';
 
 export default function TeacherDashboard() {
   const { data: session } = useSession();
@@ -15,22 +16,27 @@ export default function TeacherDashboard() {
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [topics, setTopics] = useState<Topic[]>([]);
   const [modules, setModules] = useState<Module[]>([]);
+  const [recentActivity, setRecentActivity] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState<'subjects' | 'topics' | 'modules'>('subjects');
   const [loading, setLoading] = useState(true);
 
   const fetchData = useCallback(async () => {
     if (!teacherId) return;
     try {
-      const [resSub, resTop, resMod] = await Promise.all([
+      const [resSub, resTop, resMod, resAnalytics] = await Promise.all([
         fetch(`/api/subjects?teacherId=${teacherId}`),
         fetch(`/api/topics?teacherId=${teacherId}`),
-        fetch(`/api/modules?teacherId=${teacherId}`)
+        fetch(`/api/modules?teacherId=${teacherId}`),
+        fetch(`/api/analytics`)
       ]);
-      const [subData, topData, modData] = await Promise.all([resSub.json(), resTop.json(), resMod.json()]);
+      const [subData, topData, modData, analyticsData] = await Promise.all([
+        resSub.json(), resTop.json(), resMod.json(), resAnalytics.json()
+      ]);
       
       if (subData.success) setSubjects(subData.data);
       if (topData.success) setTopics(topData.data);
       if (modData.success) setModules(modData.data);
+      if (analyticsData.success) setRecentActivity(analyticsData.data.recentActivity || []);
     } catch (err) {
       console.error('Failed to fetch teacher content:', err);
     } finally {
@@ -44,88 +50,151 @@ export default function TeacherDashboard() {
 
   if (loading) {
     return (
-      <div className="flex flex-col justify-center items-center h-screen gap-4">
+      <div className="flex flex-col justify-center items-center h-[60vh] gap-4">
         <div className="w-12 h-12 border-4 border-primary-glow border-t-primary rounded-full animate-spin" />
-        <p className="text-text-muted font-bold text-sm">Synchronizing your academic sector...</p>
+        <p className="text-text-muted font-bold text-[0.7rem] uppercase tracking-widest animate-pulse">Synchronizing academic sector...</p>
       </div>
     );
   }
 
   return (
-    <div className="animate-fade-in pb-32 px-6 sm:px-10">
-      <div className="flex flex-col lg:flex-row lg:justify-between lg:items-end gap-10 mb-16 md:mb-24 px-2">
-        <div className="flex gap-6 items-center">
-          <div className="shrink-0 w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center bg-white/10 dark:bg-black/10 backdrop-blur-2xl rounded-2xl shadow-xl border border-primary-glow animate-float glossy-border">
-            <Image src="/logosm.svg" alt="ICT Learner NG" width={50} height={45} priority />
+    <div className="animate-fade-in pb-32 px-4 sm:px-8 lg:px-12">
+      {/* Header Section */}
+      <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-8 mb-12 animate-fade-in-down">
+        <div className="flex gap-5 items-center">
+          <div className="shrink-0 w-16 h-16 flex items-center justify-center bg-white rounded-2xl shadow-sm border border-card-border animate-float">
+            <Image src="/logosm.svg" alt="ICT Learner NG" width={40} height={35} priority />
           </div>
           <div>
-            <h2 className="gradient-text fluid-text-h1 mb-1 tracking-tighter">Teacher Hub</h2>
-            <p className="text-text-muted font-bold text-[clamp(1rem,1.5vw+0.5rem,1.25rem)] opacity-80">Architecting the next generation of ICT excellence.</p>
+            <h2 className="text-4xl font-black text-primary mb-1 tracking-tighter">Teacher Hub</h2>
+            <p className="text-text-muted font-bold text-sm opacity-60">Architecting the next generation of ICT excellence.</p>
           </div>
         </div>
-        <div className="flex items-center gap-6 sm:gap-10 lg:pb-3 ml-auto lg:ml-0 bg-foreground/5 p-4 rounded-2xl backdrop-blur-md border border-white/5">
-          <div className="hidden xs:block text-left sm:text-right">
-            <p className="text-[0.7rem] text-text-muted uppercase tracking-[0.3em] font-black mb-1 opacity-60">Authenticated Architect</p>
-            <p className="font-black text-xl text-foreground tracking-tight">{teacherName}</p>
+        <div className="flex items-center gap-6 bg-white p-3 rounded-2xl border border-card-border shadow-sm ml-auto lg:ml-0">
+          <div className="hidden sm:block text-right">
+            <p className="text-[0.6rem] text-text-muted uppercase tracking-[0.2em] font-black mb-0.5 opacity-50">Authenticated Architect</p>
+            <p className="font-black text-lg text-foreground tracking-tight">{teacherName}</p>
           </div>
-          <button onClick={() => signOut({ callbackUrl: '/login' })} className="btn btn-outline border-primary/20 px-8 py-3 text-sm font-black hover:bg-primary/10">
+          <button onClick={() => signOut({ callbackUrl: '/login' })} className="btn btn-outline border-primary/20 px-6 py-2.5 text-[0.75rem] font-black">
             Sign Out
           </button>
         </div>
       </div>
 
-      <div className="stat-grid mb-20 px-2 lg:px-4">
-        <div className="peak-card glossy-border p-6 sm:p-10 text-center group">
-          <div className="text-4xl sm:text-6xl font-black text-foreground mb-3 group-hover:scale-110 transition-transform tracking-tighter">{subjects.length}</div>
-          <div className="text-[0.75rem] sm:text-[0.9rem] font-black text-text-muted uppercase tracking-[0.3em] opacity-60">Academic Sectors</div>
-        </div>
-        <div className="peak-card glossy-border p-6 sm:p-10 text-center group">
-          <div className="text-4xl sm:text-6xl font-black text-primary mb-3 group-hover:scale-110 transition-transform tracking-tighter">{topics.length}</div>
-          <div className="text-[0.75rem] sm:text-[0.9rem] font-black text-text-muted uppercase tracking-[0.3em] opacity-60">Topic Clusters</div>
-        </div>
-        <div className="peak-card glossy-border p-6 sm:p-10 text-center group">
-          <div className="text-4xl sm:text-6xl font-black text-secondary mb-3 group-hover:scale-110 transition-transform tracking-tighter">{modules.length}</div>
-          <div className="text-[0.75rem] sm:text-[0.9rem] font-black text-text-muted uppercase tracking-[0.3em] opacity-60">5E Blueprints</div>
-        </div>
-      </div>
+      <div className="main-content-layout">
+        {/* Main Management Sector */}
+        <div className="flex flex-col gap-10">
+          {/* Stat Overview */}
+          <div className="stat-grid animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+            <div className="peak-card p-8 bg-white border-none shadow-sm text-center group">
+              <div className="text-5xl font-black text-foreground mb-2 group-hover:scale-110 transition-transform tracking-tighter">{subjects.length}</div>
+              <div className="text-[0.65rem] font-black text-text-muted uppercase tracking-[0.2em] opacity-50">Sectors</div>
+            </div>
+            <div className="peak-card p-8 bg-white border-none shadow-sm text-center group">
+              <div className="text-5xl font-black text-primary mb-2 group-hover:scale-110 transition-transform tracking-tighter">{topics.length}</div>
+              <div className="text-[0.65rem] font-black text-text-muted uppercase tracking-[0.2em] opacity-50">Clusters</div>
+            </div>
+            <div className="peak-card p-8 bg-white border-none shadow-sm text-center group">
+              <div className="text-5xl font-black text-secondary mb-2 group-hover:scale-110 transition-transform tracking-tighter">{modules.length}</div>
+              <div className="text-[0.65rem] font-black text-text-muted uppercase tracking-[0.2em] opacity-50">Blueprints</div>
+            </div>
+          </div>
 
-      <div className="tabs-container mb-16 p-2 bg-foreground/5 backdrop-blur-xl glossy-border">
-        <button 
-          className={`tab-btn px-8 py-4 text-sm uppercase tracking-widest ${activeTab === 'subjects' ? 'tab-btn-active scale-[1.02]' : 'opacity-60'}`} 
-          onClick={() => setActiveTab('subjects')}
-        >
-          📂 Sectors
-        </button>
-        <button 
-          className={`tab-btn px-8 py-4 text-sm uppercase tracking-widest ${activeTab === 'topics' ? 'tab-btn-active scale-[1.02]' : 'opacity-60'}`} 
-          onClick={() => setActiveTab('topics')}
-        >
-          📚 Clusters
-        </button>
-        <button 
-          className={`tab-btn px-8 py-4 text-sm uppercase tracking-widest ${activeTab === 'modules' ? 'tab-btn-active scale-[1.02]' : 'opacity-60'}`} 
-          onClick={() => setActiveTab('modules')}
-        >
-          ✨ Blueprints
-        </button>
-      </div>
+          {/* Tab Management */}
+          <div className="flex flex-col gap-8 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+            <div className="tabs-container p-1.5 bg-white shadow-sm border border-card-border rounded-2xl flex gap-2">
+              <button 
+                className={`tab-btn flex-1 px-6 py-3.5 text-[0.7rem] uppercase tracking-widest font-black rounded-xl transition-all ${activeTab === 'subjects' ? 'bg-primary text-white shadow-lg shadow-primary/20 scale-[1.02]' : 'text-text-muted hover:bg-card-bg'}`}
+                onClick={() => setActiveTab('subjects')}
+              >
+                📂 Sectors
+              </button>
+              <button 
+                className={`tab-btn flex-1 px-6 py-3.5 text-[0.7rem] uppercase tracking-widest font-black rounded-xl transition-all ${activeTab === 'topics' ? 'bg-primary text-white shadow-lg shadow-primary/20 scale-[1.02]' : 'text-text-muted hover:bg-card-bg'}`}
+                onClick={() => setActiveTab('topics')}
+              >
+                📚 Clusters
+              </button>
+              <button 
+                className={`tab-btn flex-1 px-6 py-3.5 text-[0.7rem] uppercase tracking-widest font-black rounded-xl transition-all ${activeTab === 'modules' ? 'bg-primary text-white shadow-lg shadow-primary/20 scale-[1.02]' : 'text-text-muted hover:bg-card-bg'}`}
+                onClick={() => setActiveTab('modules')}
+              >
+                ✨ Blueprints
+              </button>
+            </div>
 
-      <div className="px-2 lg:px-4 animate-fade-in">
-        {activeTab === 'subjects' && (
-          <div className="peak-card glossy-border p-0 overflow-hidden bg-transparent border-none shadow-none">
-            <SubjectsTab subjects={subjects} setSubjects={setSubjects} />
+            <div className="animate-fade-in">
+              {activeTab === 'subjects' && <SubjectsTab subjects={subjects} setSubjects={setSubjects} />}
+              {activeTab === 'topics' && <TopicsTab topics={topics} setTopics={setTopics} subjects={subjects} />}
+              {activeTab === 'modules' && <ModulesTab modules={modules} setModules={setModules} topics={topics} subjects={subjects} />}
+            </div>
           </div>
-        )}
-        {activeTab === 'topics' && (
-          <div className="peak-card glossy-border p-0 overflow-hidden bg-transparent border-none shadow-none">
-            <TopicsTab topics={topics} setTopics={setTopics} subjects={subjects} />
+        </div>
+
+        {/* Management Insights Column */}
+        <aside className="insights-panel animate-fade-in-right" style={{ animationDelay: '0.3s' }}>
+          <div className="peak-card p-8 bg-card-bg border-none shadow-none mb-8">
+            <h4 className="text-lg font-black mb-6 flex items-center gap-3 text-primary">
+              <Zap size={24} className="text-secondary" /> Quick Actions
+            </h4>
+            <div className="flex flex-col gap-4">
+              <button 
+                onClick={() => setActiveTab('modules')} 
+                className="btn btn-primary w-full py-4 text-[0.75rem] font-black uppercase tracking-widest gap-4 shadow-lg shadow-primary/20 flex items-center justify-center"
+              >
+                <Plus size={20} /> Create New Module
+              </button>
+              <button 
+                onClick={() => setActiveTab('subjects')}
+                className="btn btn-outline hover:bg-white bg-white w-full py-4 text-[0.75rem] font-black uppercase tracking-widest gap-4 border-primary/10 flex items-center justify-center"
+              >
+                <FolderPlus size={18} className="text-primary" /> Design New Sector
+              </button>
+            </div>
           </div>
-        )}
-        {activeTab === 'modules' && (
-          <div className="peak-card glossy-border p-0 overflow-hidden bg-transparent border-none shadow-none">
-            <ModulesTab modules={modules} setModules={setModules} topics={topics} subjects={subjects} />
+
+          <div className="peak-card p-8 bg-white border border-card-border shadow-sm mb-8">
+            <h4 className="text-lg font-black mb-6 flex items-center gap-3 text-secondary">
+              <BellRing size={22} className="text-amber-500" /> Global Activity
+            </h4>
+            <div className="flex flex-col gap-6">
+              {recentActivity.length === 0 ? (
+                <p className="text-xs font-bold text-text-muted italic">No recent student activity detected on your modules.</p>
+              ) : (
+                recentActivity.map((log, i) => {
+                  const date = new Date(log.time);
+                  const timeAgo = Math.round((new Date().getTime() - date.getTime()) / 60000);
+                  const timeDisplay = timeAgo < 60 ? `${timeAgo}m ago` : timeAgo < 1440 ? `${Math.floor(timeAgo/60)}h ago` : `${Math.floor(timeAgo/1440)}d ago`;
+                  return (
+                    <div key={log._id || i} className="flex gap-4 items-start group">
+                      <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center font-black text-primary text-sm shadow-sm transition-transform group-hover:scale-110 shrink-0">
+                        {log.user[0]}
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-foreground">
+                          {log.user} <span className="font-medium text-text-muted text-[0.75rem] block mt-0.5">{log.event}: {log.moduleTitle}</span>
+                        </p>
+                        <p className="text-[0.65rem] text-text-muted font-black opacity-50 uppercase tracking-wider mt-1">{timeDisplay}</p>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
           </div>
-        )}
+
+          <div className="peak-card p-8 bg-primary text-white border-none shadow-xl relative overflow-hidden group">
+            <div className="absolute -right-4 -bottom-4 text-9xl opacity-10 group-hover:scale-110 transition-transform">🧠</div>
+            <h4 className="text-lg font-black mb-4 relative z-10 text-white">AI Constructor Matrix</h4>
+            <p className="text-sm font-medium opacity-90 mb-8 relative z-10 leading-relaxed text-white">
+              &quot;Analysis indicates your students are highly engaged with Binary Logic. Generating advanced follow-up activities is recommended to capitalize on current cognitive momentum.&quot;
+            </p>
+            <div className="flex items-center gap-3 p-3 bg-white/10 rounded-xl border border-white/10 relative z-10 uppercase tracking-widest text-[0.65rem] font-bold">
+               <span className="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
+               Neural Network Active
+            </div>
+          </div>
+        </aside>
       </div>
     </div>
   );

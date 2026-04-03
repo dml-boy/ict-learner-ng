@@ -1,15 +1,32 @@
 'use client';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import styles from './Sidebar.module.css';
 import Image from 'next/image';
+import { 
+  LayoutDashboard, 
+  BookOpen, 
+  FlaskConical, 
+  Users, 
+  Trophy, 
+  Presentation, 
+  Settings, 
+  BarChart3 
+} from 'lucide-react';
 
-const NAV_ITEMS = [
-  { href: '/student', label: 'Dashboard', icon: '📊' },
-  { href: '/student/modules', label: 'My Modules', icon: '📚' },
-  { href: '/student/labs', label: 'Virtual Labs', icon: '🧪' },
-  { href: '/student/community', label: 'Peer Learning', icon: '👥' },
-  { href: '/student/achievements', label: 'Achievements', icon: '🏆' },
+const STUDENT_NAV_ITEMS = [
+  { href: '/student', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/student/modules', label: 'My Modules', icon: BookOpen },
+  { href: '/student/labs', label: 'Virtual Labs', icon: FlaskConical },
+  { href: '/student/community', label: 'Peer Learning', icon: Users },
+  { href: '/student/achievements', label: 'Achievements', icon: Trophy },
+];
+
+const TEACHER_NAV_ITEMS = [
+  { href: '/teacher', label: 'Teacher Hub', icon: LayoutDashboard },
+  { href: '/teacher/analytics', label: 'Global Analytics', icon: BarChart3 },
+  { href: '/teacher/settings', label: 'Platform Settings', icon: Settings },
 ];
 
 export default function Sidebar({ isOpen, setIsOpen }: { 
@@ -17,6 +34,10 @@ export default function Sidebar({ isOpen, setIsOpen }: {
   setIsOpen: (open: boolean) => void 
 }) {
   const pathname = usePathname();
+  const { data: session } = useSession();
+  const userRole = (session?.user as { role?: string })?.role || 'student';
+  const isTeacher = userRole === 'teacher';
+  const navItemsToUse = isTeacher ? TEACHER_NAV_ITEMS : STUDENT_NAV_ITEMS;
 
   return (
     <aside className={`${styles.sidebar} ${isOpen ? styles.open : ''}`}>
@@ -25,12 +46,15 @@ export default function Sidebar({ isOpen, setIsOpen }: {
         onClick={() => setIsOpen(false)}
         aria-label="Close Menu"
       >
-        ✕
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
       </button>
 
       <div className={styles.logo}>
         <div className={styles.logoIcon}>
-          <Image src="/logosm.svg" alt="ICT Learner NG" width={32} height={32} />
+          <Image src="/logosm.svg" alt="ICT Learner NG" width={36} height={36} priority style={{ filter: 'brightness(0) invert(1)' }} />
         </div>
         <div className={styles.logoText}>
           <span className={styles.brandName}>ICT LEARNER</span>
@@ -41,15 +65,16 @@ export default function Sidebar({ isOpen, setIsOpen }: {
       <nav className={styles.nav}>
         <div className={styles.navGroup}>
           <span className={styles.navLabel}>Main Menu</span>
-          {NAV_ITEMS.map((item) => {
+          {navItemsToUse.map((item) => {
             const isActive = pathname === item.href;
+            const IconComponent = item.icon;
             return (
               <Link 
                 key={item.href} 
                 href={item.href} 
                 className={`${styles.navLink} ${isActive ? styles.active : ''}`}
               >
-                <span className={styles.icon}>{item.icon}</span>
+                <div className={styles.icon}><IconComponent size={20} strokeWidth={isActive ? 3 : 2} /></div>
                 <span className={styles.label}>{item.label}</span>
                 {isActive && <div className={styles.activeIndicator} />}
               </Link>
@@ -57,27 +82,22 @@ export default function Sidebar({ isOpen, setIsOpen }: {
           })}
         </div>
 
-        <div className={styles.navGroup} style={{ marginTop: '2rem' }}>
-          <span className={styles.navLabel}>Resources</span>
-          <Link href="/student/whiteboard" className={styles.navLink}>
-            <span className={styles.icon}>🎨</span>
-            <span className={styles.label}>Whiteboard</span>
-          </Link>
-          <Link href="/student/settings" className={styles.navLink}>
-            <span className={styles.icon}>⚙️</span>
-            <span className={styles.label}>Settings</span>
-          </Link>
-        </div>
+        {!isTeacher && (
+          <div className={styles.navGroup} style={{ marginTop: '2rem' }}>
+            <span className={styles.navLabel}>Resources</span>
+            <Link href="/student/whiteboard" className={`${styles.navLink} ${pathname === '/student/whiteboard' ? styles.active : ''}`}>
+              <div className={styles.icon}><Presentation size={20} strokeWidth={pathname === '/student/whiteboard' ? 3 : 2} /></div>
+              <span className={styles.label}>Whiteboard</span>
+            </Link>
+            <Link href="/student/settings" className={`${styles.navLink} ${pathname === '/student/settings' ? styles.active : ''}`}>
+              <div className={styles.icon}><Settings size={20} strokeWidth={pathname === '/student/settings' ? 3 : 2} /></div>
+              <span className={styles.label}>Settings</span>
+            </Link>
+          </div>
+        )}
       </nav>
       
       <div className={styles.footer}>
-        <div className={styles.helpCard}>
-          <span style={{ fontSize: '1.2rem' }}>💡</span>
-          <p>Need help with a module?</p>
-          <button className="btn btn-primary" style={{ padding: '0.4rem 0.8rem', fontSize: '0.75rem', marginTop: '0.5rem', width: '100%' }}>
-            Ask AI Tutor
-          </button>
-        </div>
         <p className={styles.copyright}>© 2026 ICT Learner NG</p>
       </div>
     </aside>

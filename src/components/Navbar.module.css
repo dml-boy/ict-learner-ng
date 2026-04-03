@@ -4,16 +4,15 @@
   top: 0;
   left: 0;
   right: 0;
-  background: var(--card-bg);
-  backdrop-filter: blur(20px) saturate(140%);
-  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  background: white;
   border-bottom: 1px solid var(--card-border);
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 1rem;
-  z-index: 90;
-  transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+  z-index: 80;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  transition: all 0.3s ease;
 }
 
 @media (min-width: 1024px) {
@@ -34,20 +33,21 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
-  background: hsla(158, 94%, 30%, 0.05);
+  width: 44px;
+  height: 44px;
+  background: var(--primary-glow);
   color: var(--primary);
-  border: 1px solid hsla(158, 94%, 30%, 0.1);
-  border-radius: 12px;
-  font-size: 1.25rem;
+  border: 1.5px solid var(--primary-glow);
+  border-radius: 14px;
   cursor: pointer;
-  transition: var(--transition);
+  transition: all 0.3s ease;
 }
 
 .menuBtn:hover {
   background: var(--primary);
   color: white;
+  transform: scale(1.05);
+  box-shadow: 0 4px 16px var(--primary-glow);
 }
 
 @media (min-width: 1024px) {
@@ -71,39 +71,39 @@
 .searchIcon {
   position: absolute;
   left: 1rem;
-  font-size: 0.9rem;
-  opacity: 0.4;
+  opacity: 0.5;
+  color: var(--primary);
 }
 
 .searchInput {
-  background: hsla(0, 0%, 50%, 0.05);
+  background: var(--card-bg);
   border: 1px solid var(--card-border);
-  border-radius: var(--radius-sm);
-  padding: 0.8rem 1rem 0.8rem 2.8rem;
+  border-radius: 16px;
+  padding: 0.8rem 1rem 0.8rem 3rem;
   color: var(--foreground);
   width: 200px;
-  font-size: 0.95rem;
-  font-weight: 500;
+  font-size: 0.9rem;
+  font-weight: 600;
   outline: none;
-  transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+  transition: all 0.4s ease;
 }
 
 @media (min-width: 1280px) {
   .searchInput {
-    width: 320px;
+    width: 380px;
   }
 }
 
 .searchInput:focus {
-  background: white;
+  background: var(--card-bg);
   border-color: var(--primary);
-  box-shadow: 0 0 0 6px var(--primary-glow);
-  width: 240px;
+  box-shadow: 0 0 0 8px var(--primary-glow);
+  width: 280px;
 }
 
 @media (min-width: 1280px) {
   .searchInput:focus {
-    width: 400px;
+    width: 460px;
   }
 }
 
@@ -111,6 +111,44 @@
   display: flex;
   align-items: center;
   gap: 2rem;
+}
+
+.actionBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  background: hsla(210, 47%, 11%, 0.04);
+  color: var(--foreground);
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.actionBtn:hover {
+  background: hsla(210, 47%, 11%, 0.08);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.actionBtn:active {
+  transform: translateY(0) scale(0.95);
+}
+
+.themeBtn {
+  background: hsla(199, 89%, 48%, 0.08); /* Secondary Glow */
+  border-color: hsla(199, 89%, 48%, 0.15);
+  color: var(--secondary);
+}
+
+.themeBtn:hover {
+  background: var(--secondary);
+  color: white;
+  box-shadow: 0 8px 16px var(--secondary-glow);
 }
 
 .user {
