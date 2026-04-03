@@ -126,7 +126,6 @@ async function seed() {
       ],
       createdBy: TEACHER_ID,
     });
-
     // Module C: Digital Footprints
     await Module.create({
       title: 'Digital Shadows & Footprints',
@@ -148,6 +147,32 @@ async function seed() {
           options: ['Deleting all accounts', 'Using a fake name', 'Mindful sharing and privacy hygiene', 'Ignoring it'],
           correctAnswer: 2,
           explanation: 'Mindful sharing and regular privacy checks are the most sustainable ways to build a positive digital presence.',
+        },
+      ],
+      createdBy: TEACHER_ID,
+    });
+
+    // Module D: Cyber Defense
+    await Module.create({
+      title: 'Cyber Defense: Defensive Maneuvers',
+      content: 'Mastering the art of digital self-defense — from elite password hygiene to identifying sophisticated phishing attempts.',
+      topicId: cyberEthics._id,
+      type: 'activity',
+      engage: 'Have you ever received a "critical" email from a bank you do not even use? Or been asked to "verify" your password for no reason? These are the front lines of digital warfare.',
+      explore: 'Examine a series of "Look-alike" URLs (e.g., faceb00k.com, paypa1.com). How quickly can you spot the subtle mismatches? Why do attackers use these specific techniques?',
+      explain: 'Phishing is a social engineering attack used to steal user data. Multifactor Authentication (MFA) and strong, unique passwords (using passphrases or managers) are your primary shields.',
+      elaborate: new Map([
+        ['Technical', 'Look for the "S" in HTTPS — even though it doesn\'t guarantee safety, its absence is a red flag. Always check the certificate domain.'],
+        ['Behavioral', 'Adopt the "Zero Trust" mindset. If you didn\'t initiate the request, don\'t provide the data.'],
+      ]),
+      evaluate: 'Develop a "Safety Checklist" for anyone checking their email on a public Wi-Fi network. What are the three most critical points?',
+      constructivistNote: 'Encourage students to act as "Cyber Guardians" who teach their family members how to spot these threats.',
+      questions: [
+        {
+          question: 'What is the most secure way to handle password management?',
+          options: ['Using the same strong password everywhere', 'Writing passwords in a physical book', 'Using a reputable password manager with unique passphrases', 'Using "123456"'],
+          correctAnswer: 2,
+          explanation: 'A password manager allows you to have unique, complex passwords for every service without having to memorize them all.',
         },
       ],
       createdBy: TEACHER_ID,

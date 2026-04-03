@@ -51,6 +51,6 @@ const ModuleSchema: Schema = new Schema(
   { timestamps: true }
 );
 
-const Module: Model<IModule> = mongoose.models.Module || mongoose.model<IModule>('Module', ModuleSchema);
+const Module: Model<IModule> = mongoose.models.Module || mongoose.model<IModule>('Module', ModuleSchema, 'modules');
 
 export default Module;

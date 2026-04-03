@@ -23,6 +23,6 @@ const SubjectSchema: Schema = new Schema(
   { timestamps: true }
 );
 
-const Subject: Model<ISubject> = mongoose.models.Subject || mongoose.model<ISubject>('Subject', SubjectSchema, 'ict-learner-nigeria');
+const Subject: Model<ISubject> = mongoose.models.Subject || mongoose.model<ISubject>('Subject', SubjectSchema, 'subjects');
 
 export default Subject;
