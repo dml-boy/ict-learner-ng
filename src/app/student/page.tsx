@@ -2,9 +2,11 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
+import Image from 'next/image';
 import Link from 'next/link';
 import LiveEditor from '@/components/LiveEditor';
 import { Module, StudentProgress, LeaderboardEntry } from '@/types';
+import { Skeleton } from 'boneyard-js/react';
 
 export default function StudentDashboard() {
   const [modules, setModules] = useState<Module[]>([]);
@@ -58,54 +60,50 @@ export default function StudentDashboard() {
 
   const stats = [
     { label: 'Available', value: modules.length, icon: '📂' },
-    { label: 'Mastered', value: progress.filter(p => p.status === 'completed').length, icon: '🛡️' },
-    { label: 'In Orbit', value: modules.length - progress.filter(p => p.status === 'completed').length, icon: '🚀' },
+    { label: 'Mastered', value: progress.filter((p: StudentProgress) => p.status === 'completed').length, icon: '🛡️' },
+    { label: 'In Orbit', value: modules.length - progress.filter((p: StudentProgress) => p.status === 'completed').length, icon: '🚀' },
   ];
 
-  if (loading) {
-    return (
-      <div className="flex flex-col justify-center items-center h-[60vh] gap-4">
-        <div className="w-12 h-12 border-4 border-primary-glow border-t-primary rounded-full animate-spin" />
-        <p className="text-text-muted font-bold text-[0.7rem] uppercase tracking-widest animate-pulse">Materializing your learning universe...</p>
-      </div>
-    );
-  }
-
   return (
-    <div className="animate-fade-in px-4 sm:px-8 lg:px-12 pb-32">
-      {/* Welcome Header - PeerLearn Style Refinement */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 mb-12 animate-fade-in-down">
-        <div>
-          <h2 className="text-4xl sm:text-5xl font-black text-primary mb-3 tracking-tighter" style={{ lineHeight: 1.1 }}>
-            Welcome back, <span className="text-foreground">{userName}</span>
-          </h2>
-          <p className="text-text-muted font-bold text-lg opacity-80">Forge your ICT expertise through discovery.</p>
-        </div>
-        
-        {/* Sync Status - Filling the row */}
-        <div className="flex items-center gap-4 bg-white/50 backdrop-blur-md px-6 py-4 rounded-2xl border border-primary/5 shadow-sm">
-          <div className="relative">
-            <div className="w-3 h-3 bg-secondary rounded-full animate-pulse"></div>
-            <div className="absolute inset-0 w-3 h-3 bg-secondary rounded-full animate-ping opacity-75"></div>
+    <Skeleton name="student-dashboard" loading={loading}>
+      <div className="animate-fade-in px-4 sm:px-8 lg:px-12 pb-32">
+      {/* Standardized Dashboard Header */}
+      <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-8 mb-12 animate-fade-in-down">
+        <div className="flex gap-5 items-center">
+          <div className="shrink-0 w-16 h-16 flex items-center justify-center bg-white rounded-2xl shadow-sm border border-card-border animate-float">
+            <Image src="/logosm.svg" alt="ICT Learner NG" width={40} height={35} priority />
           </div>
           <div>
-            <p className="text-[0.65rem] font-black text-text-muted uppercase tracking-widest leading-none mb-1">Neural Uplink</p>
-            <p className="text-sm font-bold text-primary">Stable & Synchronized</p>
+            <h2 className="text-4xl font-black text-primary mb-1 tracking-tighter">Welcome back, <span className="text-foreground">{userName}</span></h2>
+            <p className="text-text-muted font-bold text-sm opacity-60">Forge your ICT expertise through discovery.</p>
+          </div>
+        </div>
+        
+        {/* Sync Status - Glass Morphic Panel */}
+        <div className="flex items-center gap-6 glass-morphism p-3 px-6 rounded-2xl ml-auto lg:ml-0">
+          <div className="relative">
+            <div className="w-2.5 h-2.5 bg-secondary rounded-full animate-pulse"></div>
+            <div className="absolute inset-0 w-2.5 h-2.5 bg-secondary rounded-full animate-ping opacity-75"></div>
+          </div>
+          <div className="text-right sm:text-left">
+            <p className="text-[0.6rem] font-black text-text-muted uppercase tracking-[0.2em] mb-0.5 opacity-50">Neural Uplink</p>
+            <p className="font-black text-sm text-primary tracking-tight">Stable & Synchronized</p>
           </div>
         </div>
       </div>
 
       <div className="main-content-layout">
         <div className="flex flex-col gap-12">
-          {/* Progress Overview Grid */}
+          {/* Progress Overview Grid - Synchronized Typography */}
           <div className="stat-grid animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
             {stats.map((stat, i) => (
-              <div key={i} className="peak-card p-8 hover:shadow-xl group flex flex-col items-center text-center glossy-border">
-                <div className="w-14 h-14 rounded-2xl bg-primary/5 flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-all duration-500 group-hover:rotate-6">
-                  {stat.icon}
+              <div key={i} className="peak-card p-8 bg-white border-none shadow-sm text-center group">
+                <div className="text-5xl font-black text-foreground mb-2 group-hover:scale-110 transition-transform tracking-tighter tabular-nums">
+                  {stat.value}
                 </div>
-                <h3 className="text-4xl font-black text-foreground mb-2 tracking-tighter tabular-nums">{stat.value}</h3>
-                <p className="text-[0.7rem] font-black text-text-muted uppercase tracking-[0.2em] opacity-60 leading-none">{stat.label}</p>
+                <div className="text-[0.65rem] font-black text-text-muted uppercase tracking-[0.2em] opacity-50 flex items-center justify-center gap-2">
+                  <span className="text-lg opacity-100 group-hover:rotate-12 transition-transform">{stat.icon}</span> {stat.label}
+                </div>
               </div>
             ))}
           </div>
@@ -122,7 +120,7 @@ export default function StudentDashboard() {
 
           {/* Module List Grid */}
           <div className="dashboard-grid animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
-            {modules.map((mod) => {
+            {modules.map((mod: Module) => {
               const status = getModuleStatus(mod._id);
               const isCompleted = status === 'completed';
               const isInProgress = status === 'in-progress';
@@ -174,7 +172,7 @@ export default function StudentDashboard() {
               {leaderboard.length === 0 ? (
                 <p className="text-text-muted text-sm italic font-medium">No activity detected yet. Be the first to initiate an uplink!</p>
               ) : (
-                leaderboard.slice(0, 3).map((learner, i) => (
+                leaderboard.slice(0, 3).map((learner: LeaderboardEntry, i: number) => (
                   <div key={i} className="flex gap-4 items-start group">
                     <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center font-black text-primary text-sm shadow-sm transition-transform group-hover:scale-110 shrink-0">
                       {learner.name ? learner.name[0] : 'A'}
@@ -219,5 +217,6 @@ export default function StudentDashboard() {
         </div>
       </section>
     </div>
+    </Skeleton>
   );
 }

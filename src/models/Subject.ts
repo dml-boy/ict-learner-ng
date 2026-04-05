@@ -23,6 +23,8 @@ const SubjectSchema: Schema = new Schema(
   { timestamps: true }
 );
 
+SubjectSchema.index({ createdBy: 1 });
+
 const Subject: Model<ISubject> = mongoose.models.Subject || mongoose.model<ISubject>('Subject', SubjectSchema, 'subjects');
 
 export default Subject;

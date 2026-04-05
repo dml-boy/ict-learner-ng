@@ -20,7 +20,8 @@ export async function GET(request: NextRequest) {
     const modules = await Module.find(filter)
       .populate('topicId', 'title')
       .populate('createdBy', 'name email')
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .lean();
       
     return NextResponse.json({ success: true, count: modules.length, data: modules });
   } catch (error) {

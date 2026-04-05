@@ -17,7 +17,7 @@ export async function GET() {
     await dbConnect();
 
     // 1. Fetch modules created by this teacher
-    const teacherModules = await Module.find({ createdBy: teacherId }, '_id');
+    const teacherModules = await Module.find({ createdBy: teacherId }, '_id').lean();
     const moduleIds = teacherModules.map(m => m._id);
 
     // 2. Fetch recent activity (e.g., last 10 completed or in-progress updates) for these modules
@@ -27,7 +27,8 @@ export async function GET() {
       .populate('userId', 'name')
       .populate('moduleId', 'title')
       .sort({ updatedAt: -1 })
-      .limit(5);
+      .limit(5)
+      .lean();
 
     const formattedActivity = recentActivity.map(activity => {
       const isCompleted = activity.status === 'completed';

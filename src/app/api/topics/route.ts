@@ -19,7 +19,8 @@ export async function GET(request: NextRequest) {
     
     const topics = await Topic.find(filter)
       .populate('createdBy', 'name email')
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .lean();
       
     return NextResponse.json({ success: true, count: topics.length, data: topics });
   } catch (error) {

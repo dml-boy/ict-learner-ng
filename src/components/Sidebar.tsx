@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useSession } from 'next-auth/react';
+import { useSession, signOut } from 'next-auth/react';
 import styles from './Sidebar.module.css';
 import Image from 'next/image';
 import { 
@@ -12,22 +12,33 @@ import {
   Trophy, 
   Presentation, 
   Settings, 
-  BarChart3 
+  BarChart3,
+  LogOut,
 } from 'lucide-react';
 
 const STUDENT_NAV_ITEMS = [
-  { href: '/student', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/student/modules', label: 'My Modules', icon: BookOpen },
-  { href: '/student/labs', label: 'Virtual Labs', icon: FlaskConical },
-  { href: '/student/community', label: 'Peer Learning', icon: Users },
+  { href: '/student',              label: 'Dashboard',    icon: LayoutDashboard, exact: true },
+  { href: '/student/modules',      label: 'My Modules',   icon: BookOpen },
+  { href: '/student/labs',         label: 'Virtual Labs', icon: FlaskConical },
+  { href: '/student/community',    label: 'Peer Learning',icon: Users },
   { href: '/student/achievements', label: 'Achievements', icon: Trophy },
 ];
 
-const TEACHER_NAV_ITEMS = [
-  { href: '/teacher', label: 'Teacher Hub', icon: LayoutDashboard },
-  { href: '/teacher/analytics', label: 'Global Analytics', icon: BarChart3 },
-  { href: '/teacher/settings', label: 'Platform Settings', icon: Settings },
+const STUDENT_RESOURCE_ITEMS = [
+  { href: '/student/whiteboard', label: 'Whiteboard', icon: Presentation },
+  { href: '/student/settings',   label: 'Settings',   icon: Settings },
 ];
+
+const TEACHER_NAV_ITEMS = [
+  { href: '/teacher',            label: 'Teacher Hub',      icon: LayoutDashboard, exact: true },
+  { href: '/teacher/analytics',  label: 'Global Analytics', icon: BarChart3 },
+  { href: '/teacher/settings',   label: 'Platform Settings',icon: Settings },
+];
+
+function isNavActive(href: string, pathname: string, exact?: boolean) {
+  if (exact) return pathname === href;
+  return pathname === href || pathname.startsWith(href + '/');
+}
 
 export default function Sidebar({ isOpen, setIsOpen }: { 
   isOpen: boolean, 
@@ -36,8 +47,10 @@ export default function Sidebar({ isOpen, setIsOpen }: {
   const pathname = usePathname();
   const { data: session } = useSession();
   const userRole = (session?.user as { role?: string })?.role || 'student';
+  const userName = session?.user?.name || 'Learner';
+  const initial = userName.charAt(0).toUpperCase();
   const isTeacher = userRole === 'teacher';
-  const navItemsToUse = isTeacher ? TEACHER_NAV_ITEMS : STUDENT_NAV_ITEMS;
+  const navItems = isTeacher ? TEACHER_NAV_ITEMS : STUDENT_NAV_ITEMS;
 
   return (
     <aside className={`${styles.sidebar} ${isOpen ? styles.open : ''}`}>
@@ -63,41 +76,72 @@ export default function Sidebar({ isOpen, setIsOpen }: {
       </div>
       
       <nav className={styles.nav}>
+        {/* Main nav group */}
         <div className={styles.navGroup}>
           <span className={styles.navLabel}>Main Menu</span>
-          {navItemsToUse.map((item) => {
-            const isActive = pathname === item.href;
+          {navItems.map((item, i) => {
+            const active = isNavActive(item.href, pathname, item.exact);
             const IconComponent = item.icon;
             return (
               <Link 
                 key={item.href} 
                 href={item.href} 
-                className={`${styles.navLink} ${isActive ? styles.active : ''}`}
+                className={`${styles.navLink} ${active ? styles.active : ''}`}
+                style={{ animationDelay: `${i * 0.05}s` }}
               >
-                <div className={styles.icon}><IconComponent size={20} strokeWidth={isActive ? 3 : 2} /></div>
+                <div className={styles.iconWrap}>
+                  <IconComponent size={18} strokeWidth={active ? 2.5 : 1.8} />
+                </div>
                 <span className={styles.label}>{item.label}</span>
-                {isActive && <div className={styles.activeIndicator} />}
+                {active && <div className={styles.activeBar} />}
               </Link>
             );
           })}
         </div>
 
+        {/* Resources group — students only */}
         {!isTeacher && (
-          <div className={styles.navGroup} style={{ marginTop: '2rem' }}>
+          <div className={styles.navGroup}>
             <span className={styles.navLabel}>Resources</span>
-            <Link href="/student/whiteboard" className={`${styles.navLink} ${pathname === '/student/whiteboard' ? styles.active : ''}`}>
-              <div className={styles.icon}><Presentation size={20} strokeWidth={pathname === '/student/whiteboard' ? 3 : 2} /></div>
-              <span className={styles.label}>Whiteboard</span>
-            </Link>
-            <Link href="/student/settings" className={`${styles.navLink} ${pathname === '/student/settings' ? styles.active : ''}`}>
-              <div className={styles.icon}><Settings size={20} strokeWidth={pathname === '/student/settings' ? 3 : 2} /></div>
-              <span className={styles.label}>Settings</span>
-            </Link>
+            {STUDENT_RESOURCE_ITEMS.map((item, i) => {
+              const active = isNavActive(item.href, pathname);
+              const IconComponent = item.icon;
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`${styles.navLink} ${active ? styles.active : ''}`}
+                  style={{ animationDelay: `${(navItems.length + i) * 0.05}s` }}
+                >
+                  <div className={styles.iconWrap}>
+                    <IconComponent size={18} strokeWidth={active ? 2.5 : 1.8} />
+                  </div>
+                  <span className={styles.label}>{item.label}</span>
+                  {active && <div className={styles.activeBar} />}
+                </Link>
+              );
+            })}
           </div>
         )}
       </nav>
       
+      {/* Footer: user chip + sign out */}
       <div className={styles.footer}>
+        <div className={styles.userChip}>
+          <div className={styles.chipAvatar}>{initial}</div>
+          <div className={styles.chipInfo}>
+            <span className={styles.chipName}>{userName}</span>
+            <span className={styles.chipRole}>{isTeacher ? 'Teacher' : 'Student'}</span>
+          </div>
+          <button
+            onClick={() => signOut({ callbackUrl: '/login' })}
+            className={styles.signOutBtn}
+            title="Sign out"
+            aria-label="Sign out"
+          >
+            <LogOut size={15} strokeWidth={2.5} />
+          </button>
+        </div>
         <p className={styles.copyright}>© 2026 ICT Learner NG</p>
       </div>
     </aside>

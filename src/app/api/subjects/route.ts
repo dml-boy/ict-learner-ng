@@ -13,7 +13,8 @@ export async function GET(request: NextRequest) {
 
     const subjects = await Subject.find(filter)
       .populate('createdBy', 'name email')
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .lean();
       
     return NextResponse.json({ success: true, count: subjects.length, data: subjects });
   } catch (error) {

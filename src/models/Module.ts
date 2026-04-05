@@ -51,6 +51,9 @@ const ModuleSchema: Schema = new Schema(
   { timestamps: true }
 );
 
+ModuleSchema.index({ createdBy: 1 });
+ModuleSchema.index({ topicId: 1 });
+
 const Module: Model<IModule> = mongoose.models.Module || mongoose.model<IModule>('Module', ModuleSchema, 'modules');
 
 export default Module;

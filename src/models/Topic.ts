@@ -21,6 +21,9 @@ const TopicSchema: Schema = new Schema(
   { timestamps: true }
 );
 
+TopicSchema.index({ subjectId: 1 });
+TopicSchema.index({ createdBy: 1 });
+
 const Topic: Model<ITopic> = mongoose.models.Topic || mongoose.model<ITopic>('Topic', TopicSchema, 'topics');
 
 export default Topic;

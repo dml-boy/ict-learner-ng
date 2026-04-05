@@ -19,6 +19,8 @@
     --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     --glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.6);
     --glass-reflection: linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, transparent 40%);
+    --glass-bg: rgba(255, 255, 255, 0.35);
+    --glass-border: rgba(255, 255, 255, 0.25);
     --text-muted: #6b6b6b;
     
     --bg-mesh-1: rgba(2, 77, 60, 0.05);
@@ -148,6 +150,27 @@
     height: 6px;
   }
 
+  .glass-morphism {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+  }
+
+  .stagger-in {
+    opacity: 0;
+    transform: translateY(12px);
+    animation: staggerFadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  @keyframes staggerFadeIn {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
   .shimmer {
     position: relative;
     overflow: hidden;
@@ -171,6 +194,33 @@
     100% {
       background-position: 468px 0;
     }
+  }
+
+  /* ─── Boneyard — skeleton loading primitives ─── */
+  .skeleton-bone {
+    border-radius: 10px;
+    background: linear-gradient(
+      90deg,
+      hsla(143, 30%, 90%, 1) 25%,
+      hsla(143, 25%, 84%, 1) 50%,
+      hsla(143, 30%, 90%, 1) 75%
+    );
+    background-size: 400% 100%;
+    animation: boneyard 1.6s ease infinite;
+  }
+
+  @keyframes boneyard {
+    0%   { background-position: 100% 50%; }
+    100% { background-position: 0%   50%; }
+  }
+
+  .skeleton-pulse {
+    animation: skeletonPulse 1.8s ease-in-out infinite;
+  }
+
+  @keyframes skeletonPulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.5; }
   }
 
   .btn {

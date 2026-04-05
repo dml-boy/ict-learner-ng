@@ -130,6 +130,16 @@
   transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
   position: relative;
   text-decoration: none;
+  opacity: 0;
+  transform: translateX(-10px);
+  animation: sidebarItemIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes sidebarItemIn {
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 .navLink:hover {
@@ -139,28 +149,21 @@
 }
 
 .active {
-  background: #ffffff !important;
-  color: var(--primary) !important;
+  background: rgba(255, 255, 255, 0.15) !important;
+  color: #ffffff !important;
   font-weight: 800;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2);
 }
 
-.active .icon {
-  filter: none;
-}
-
-.icon {
-  font-size: 1.2rem;
-  width: 24px;
-  text-align: center;
-}
-
-.label {
-  flex: 1;
-}
-
-.activeIndicator {
-  display: none; /* handled by background now */
+.activeBar {
+  position: absolute;
+  left: 0;
+  top: 20%;
+  bottom: 20%;
+  width: 4px;
+  background: white;
+  border-radius: 0 4px 4px 0;
+  box-shadow: 2px 0 10px rgba(255, 255, 255, 0.5);
 }
 
 .footer {
@@ -170,20 +173,72 @@
   gap: 1.5rem;
 }
 
-.helpCard {
+.userChip {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.12);
-  padding: 1.25rem;
   border-radius: 18px;
-  text-align: center;
+  margin-bottom: 0.5rem;
 }
 
-.helpCard p {
-  font-size: 0.82rem;
+.chipAvatar {
+  width: 38px;
+  height: 38px;
+  background: white;
+  color: var(--primary);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 0.95rem;
+  flex-shrink: 0;
+}
+
+.chipInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.chipName {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: white;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chipRole {
+  font-size: 0.65rem;
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.85);
-  margin: 0.5rem 0;
-  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.signOutBtn {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.signOutBtn:hover {
+  background: #ef4444;
+  transform: scale(1.1);
 }
 
 .copyright {

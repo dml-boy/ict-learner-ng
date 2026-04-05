@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import Sidebar from './Sidebar';
 import Navbar from './Navbar';
+import BottomNav from './BottomNav';
 import Providers from './Providers';
 
 export default function LayoutWrapper({ children }: { children: React.ReactNode }) {
@@ -15,7 +16,11 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
   useEffect(() => {
     if (prevPathname.current !== pathname) {
       prevPathname.current = pathname;
-      setSidebarOpen(false);
+      // Use setTimeout to ensure the state update is asynchronous and avoids cascading render warnings
+      const timer = setTimeout(() => {
+        setSidebarOpen(false);
+      }, 0);
+      return () => clearTimeout(timer);
     }
   }, [pathname]);
 
@@ -88,10 +93,12 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
         <Navbar 
           toggleSidebar={() => setSidebarOpen(prev => !prev)} 
         />
-        <main className="flex-1 mt-[70px] lg:mt-[90px] p-4 sm:p-8 lg:p-10 animate-fade-in relative">
+        <main className="flex-1 mt-[70px] lg:mt-[90px] p-4 sm:p-8 lg:p-10 animate-fade-in relative pb-32 lg:pb-10">
           {children}
         </main>
       </div>
+
+      <BottomNav />
     </Providers>
   );
 }
