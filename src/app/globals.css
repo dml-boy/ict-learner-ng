@@ -396,17 +396,16 @@
   }
 
   .insights-panel {
-    display: none;
-    position: sticky;
-    top: calc(90px + var(--spacing-md));
-    height: fit-content;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
   }
 
   @media (min-width: 1280px) {
     .insights-panel {
-      display: flex;
-      flex-direction: column;
-      gap: var(--spacing-md);
+      position: sticky;
+      top: calc(90px + var(--spacing-md));
+      height: fit-content;
     }
   }
 
