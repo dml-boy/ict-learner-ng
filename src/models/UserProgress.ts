@@ -7,6 +7,7 @@ export interface IUserProgress extends Document {
   score: number;
   selectedContext: string;
   currentStep: number; // 0: Engage, 1: Explore, 2: Explain, 3: Elaborate, 4: Evaluate
+  engageAnswer?: string;
   reflection?: string;
   completedAt?: Date;
   personalizedContent?: {
@@ -32,6 +33,7 @@ const UserProgressSchema: Schema = new Schema(
     score: { type: Number, default: 0 },
     selectedContext: { type: String, default: '' },
     currentStep: { type: Number, default: 0 },
+    engageAnswer: { type: String, default: '' },
     reflection: { type: String, default: '' },
     completedAt: { type: Date },
     personalizedContent: {

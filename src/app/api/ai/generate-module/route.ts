@@ -12,7 +12,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: false, error: 'Topic is required' }, { status: 400 });
     }
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
     const prompt = `
       Act as an elite Constructivist Pedagogical Expert. Your goal is to design a high-fidelity 5E ICT module based on the provided topic.
@@ -22,9 +22,9 @@ export async function POST(req: Request) {
       
       Strictly follow this 5E Constructivist Architecture:
       
-      1. ENGAGE: Generate a set of 3 thought-provoking "Personal/Reflective Questions" to activate schema and create cognitive dissonance. Hook the student!
+      1. ENGAGE: Generate TWO components: (a) A set of 2-3 thought-provoking "Personal/Reflective Questions" to activate schema and (b) A "Simple Discovery Task" (e.g., 'Google X', 'Look at your phone's Y', 'Think of the last time Z happened') for the student to accomplish immediately. Hook the student!
       2. EXPLORE: Provide a specific "Hands-on Investigative Task". This should not be reading; it should be a discovery activity where students "play" with a concept.
-      3. EXPLAIN: Provide the "Theoretical Core". Formal definitions and models based on the topic. Keep it professional but accessible.
+      3. EXPLAIN: Provide the "Theoretical Core". Formal definitions and models based on the topic. This phase MUST BE BUILT to be dynamically influenced by the student's initial engagement in the Engage phase.
       4. ELABORATE: For each of the Contextual Personas, create a "Real-World Nigerian Scenario" that directly relates the topic back to the personal hooks from the Engage phase.
       5. EVALUATE: Provide a "Short Test (3 Questions)" in JSON format.
       

@@ -54,8 +54,21 @@ export interface StudentProgress {
   _id: string;
   userId: string;
   moduleId: string | Module;
-  status: 'available' | 'in-progress' | 'completed';
-  lastAccessed: string;
+  status: 'locked' | 'in-progress' | 'completed';
+  currentStep: number;
+  selectedContext: string;
+  engageAnswer: string;
+  reflection: string;
+  personalizedContent?: {
+    engage: string;
+    explore: string;
+    explain: string;
+    elaborate: string;
+    evaluate: string;
+  };
+  completedAt?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface LeaderboardEntry {

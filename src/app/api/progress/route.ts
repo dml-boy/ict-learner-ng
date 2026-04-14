@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
 
     await dbConnect();
     const body = await request.json();
-    const { moduleId, status, score, selectedContext, currentStep, reflection } = body;
+    const { moduleId, status, score, selectedContext, currentStep, reflection, engageAnswer } = body;
 
     const userId = session.user.id;
 
@@ -47,6 +47,7 @@ export async function POST(request: NextRequest) {
       completedAt?: Date;
       selectedContext?: string;
       currentStep?: number;
+      engageAnswer?: string;
       reflection?: string;
       personalizedContent?: Record<string, string>;
     }
@@ -57,6 +58,7 @@ export async function POST(request: NextRequest) {
     if (status === 'completed') updateData.completedAt = new Date();
     if (selectedContext) updateData.selectedContext = selectedContext;
     if (typeof currentStep === 'number') updateData.currentStep = currentStep;
+    if (typeof engageAnswer === 'string') updateData.engageAnswer = engageAnswer;
     if (typeof reflection === 'string') updateData.reflection = reflection;
     if (body.personalizedContent) updateData.personalizedContent = body.personalizedContent;
 
