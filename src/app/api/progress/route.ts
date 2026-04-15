@@ -8,13 +8,9 @@ import Module from '@/models/Module';
 export async function GET() {
   try {
     const session = await auth();
-    if (!session?.user) {
-      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
-    }
+    const userId = session?.user?.id || "65f1234567890abcd1234567"; // Fallback to universal guest ID
 
     await dbConnect();
-    const userId = session.user.id;
-
     const progress = await UserProgress.find({ userId }).populate('moduleId');
     return NextResponse.json({ success: true, data: progress });
   } catch (error) {
@@ -26,15 +22,11 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const session = await auth();
-    if (!session?.user) {
-      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
-    }
+    const userId = session?.user?.id || "65f1234567890abcd1234567"; // Fallback to universal guest ID
 
     await dbConnect();
     const body = await request.json();
-    const { moduleId, status, score, selectedContext, currentStep, reflection, engageAnswer } = body;
-
-    const userId = session.user.id;
+    const { moduleId, status, score, selectedContext, currentStep, reflection, engageAnswer, engageMCQAnswers } = body;
 
     if (!moduleId) {
       return NextResponse.json({ success: false, error: 'ModuleId is required' }, { status: 400 });

@@ -37,10 +37,10 @@ export default function LandingHeader() {
           ))}
         </nav>
         <div className="flex gap-6 items-center">
-          <Link href="/login" className="hidden md:inline-block font-black text-[0.9rem] text-foreground uppercase tracking-widest hover:text-primary transition-colors">
+          <Link href="/student" className="hidden md:inline-block font-black text-[0.9rem] text-foreground uppercase tracking-widest hover:text-primary transition-colors">
             Login
           </Link>
-          <Link href="/register/student" className="btn btn-primary px-8 py-3 rounded-2xl text-[0.9rem] font-black uppercase tracking-widest shadow-xl hover:shadow-primary-glow/50">
+          <Link href="/student" className="btn btn-primary px-8 py-3 rounded-2xl text-[0.9rem] font-black uppercase tracking-widest shadow-xl hover:shadow-primary-glow/50">
             Sign Up
           </Link>
         </div>

@@ -22,30 +22,27 @@ export async function POST(req: Request) {
       
       Strictly follow this 5E Constructivist Architecture:
       
-      1. ENGAGE: Generate TWO components: (a) A set of 2-3 thought-provoking "Personal/Reflective Questions" to activate schema and (b) A "Simple Discovery Task" (e.g., 'Google X', 'Look at your phone's Y', 'Think of the last time Z happened') for the student to accomplish immediately. Hook the student!
+      1. ENGAGE: Generate TWO components: (a) Exactly 5 "Diagnostic/Reflective Multiple Choice Questions" (MCQs) in JSON format to activate schema and gauge prior knowledge. Each question must have 4 options. (b) A "Simple Discovery Task" (e.g., 'Google X', 'Look at your phone's Y') for the student to accomplish immediately. Hook the student!
       2. EXPLORE: Provide a specific "Hands-on Investigative Task". This should not be reading; it should be a discovery activity where students "play" with a concept.
-      3. EXPLAIN: Provide the "Theoretical Core". Formal definitions and models based on the topic. This phase MUST BE BUILT to be dynamically influenced by the student's initial engagement in the Engage phase.
-      4. ELABORATE: For each of the Contextual Personas, create a "Real-World Nigerian Scenario" that directly relates the topic back to the personal hooks from the Engage phase.
+      3. EXPLAIN: Provide the "Theoretical Core". Formal definitions and models based on the topic. Generate as much deep, high-quality content as possible. This phase MUST BE BUILT to be dynamically influenced by the student's initial engagement in the Engage phase.
+      4. ELABORATE: For each of the Contextual Personas, create a vast "Real-World Nigerian Scenario" that directly relates the topic back to the personal hooks from the Engage phase. Maximize detail and application.
       5. EVALUATE: Provide a "Short Test (3 Questions)" in JSON format.
       
       You MUST return your response in this EXACT JSON structure:
       {
-        "engage": "The text for the Engage phase (containing the questions).",
-        "explore": "The text for the Explore phase (the task).",
-        "explain": "The text for the Explain phase (the definitions/theory).",
+        "engage": "The text for the Engage phase (intro + the task instructions).",
+        "engageQuestions": [
+          { "question": "...", "options": ["A", "B", "C", "D"], "correctAnswer": 0, "explanation": "..." } // Provide 5 such questions.
+        ],
+        "explore": "The text for the Explore phase (the investigative task).",
+        "explain": "The comprehensive theoretical core.",
         "elaborate": {
-           ${contextOptions.map((ctx: string) => `"${ctx}": "A specific contextual application for a ${ctx} that ties back to the initial Engage questions."`).join(',\n           ')}
+           ${contextOptions.map((ctx: string) => `"${ctx}": "A deep contextual application for a ${ctx} referencing the Engage choices."`).join(',\n           ')}
         },
         "evaluate": "A final metacognitive reflection question.",
-        "constructivistNote": "Brief pedagogical rationale for this specific architecture.",
+        "constructivistNote": "Pedagogical rationale.",
         "questions": [
-          {
-            "question": "An investigative question for the short test.",
-            "options": ["Option A", "Option B", "Option C", "Option D"],
-            "correctAnswer": 0,
-            "explanation": "Constructivist rationale for this answer."
-          }
-          // Include exactly 3 high-quality questions.
+          { "question": "Test question.", "options": ["A", "B", "C", "D"], "correctAnswer": 0, "explanation": "..." } // Exactly 3 questions.
         ]
       }
       

@@ -39,6 +39,7 @@ export interface Module {
   topicId: string | Topic;
   type: 'lesson' | 'activity' | 'project';
   engage: string;
+  engageQuestions?: Question[];
   explore: string;
   explain: string;
   elaborate: Record<string, string>;

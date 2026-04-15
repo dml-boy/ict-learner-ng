@@ -16,6 +16,7 @@ export default function IntroPage({ params }: { params: Promise<{ id: string }> 
   const [selectedContext, setSelectedContext] = useState('');
   const [currentStep, setCurrentStep] = useState(0);
   const [engageAnswer, setEngageAnswer] = useState('');
+  const [engageMCQAnswers, setEngageMCQAnswers] = useState<number[]>([]);
   const [personalizedContent, setPersonalizedContent] = useState<StudentProgress['personalizedContent'] | null>(null);
   const [reflection, setReflection] = useState('');
   
@@ -67,6 +68,7 @@ export default function IntroPage({ params }: { params: Promise<{ id: string }> 
           selectedContext: ctx ?? selectedContext,
           reflection: ref ?? reflection,
           engageAnswer: answer ?? engageAnswer,
+          engageMCQAnswers: engageMCQAnswers,
           personalizedContent: pContent ?? personalizedContent
         })
       });
@@ -135,7 +137,8 @@ export default function IntroPage({ params }: { params: Promise<{ id: string }> 
             teacherContent: module.content,
             moduleTitle: module.title,
             studentContext: selectedContext,
-            engageAnswer
+            engageAnswer,
+            engageMCQAnswers
           })
         });
         const data = await res.json();
@@ -231,21 +234,59 @@ export default function IntroPage({ params }: { params: Promise<{ id: string }> 
 
           {/* Engage — Input Area */}
           {currentStep === 0 && (
-            <div className="mt-12 space-y-4">
-              <label className="flex items-center gap-2 font-black text-primary text-sm uppercase tracking-widest mb-4">
-                <span className="text-xl">✍️</span> Task Completion & Initial Thought
-              </label>
-              <textarea
-                value={engageAnswer}
-                onChange={(e) => setEngageAnswer(e.target.value)}
-                placeholder="Share your discovery from the task above..."
-                className="input min-h-[120px] p-6 text-lg border-2 focus:border-primary/50 bg-slate-50/50 italic leading-relaxed"
-                disabled={!!personalizedContent}
-              />
+            <div className="mt-12 space-y-12">
+              {/* Task Section */}
+              <div className="bg-primary/5 p-8 rounded-3xl border border-primary/10">
+                <label className="flex items-center gap-2 font-black text-primary text-sm uppercase tracking-widest mb-4">
+                  <span className="text-xl">🛠️</span> Practical Hook Task
+                </label>
+                <div className="text-lg text-slate-700 italic mb-6">
+                  {module.engage}
+                </div>
+                <textarea
+                  value={engageAnswer}
+                  onChange={(e) => setEngageAnswer(e.target.value)}
+                  placeholder="Share your discovery from the task above..."
+                  className="input min-h-[100px] p-6 text-lg border-2 focus:border-primary/50 bg-white italic"
+                  disabled={!!personalizedContent}
+                />
+              </div>
+
+              {/* Diagnostic MCQs */}
+              {module.engageQuestions && module.engageQuestions.length > 0 && (
+                <div className="space-y-10">
+                  <label className="flex items-center gap-2 font-black text-primary text-sm uppercase tracking-widest">
+                    <span className="text-xl">🧠</span> Diagnostic Diagnostics (5 Questions)
+                  </label>
+                  {module.engageQuestions.map((q, qIdx) => (
+                    <div key={qIdx} className="space-y-4">
+                      <p className="font-bold text-xl text-foreground">{qIdx + 1}. {q.question}</p>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {q.options.map((opt, oIdx) => (
+                          <button
+                            key={oIdx}
+                            onClick={() => {
+                              const newAns = [...engageMCQAnswers];
+                              newAns[qIdx] = oIdx;
+                              setEngageMCQAnswers(newAns);
+                            }}
+                            disabled={!!personalizedContent}
+                            className={`p-4 text-left rounded-2xl border-2 transition-all font-bold ${engageMCQAnswers[qIdx] === oIdx ? 'border-primary bg-primary/10 text-primary' : 'border-border/40 hover:border-primary/30 text-slate-600'}`}
+                          >
+                            {opt}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+              
               {personalizedContent && (
-                <p className="text-[0.65rem] text-emerald-600 font-bold ml-2">
-                  ✓ Journey personalized. Proceed to Explore.
-                </p>
+                <div className="p-6 bg-emerald-500/10 border-2 border-emerald-500/20 rounded-2xl flex items-center gap-4 text-emerald-700 font-bold">
+                  <span className="text-2xl">✓</span>
+                  Neural connection established. Your learning path has been tailored.
+                </div>
               )}
             </div>
           )}

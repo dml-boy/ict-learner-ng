@@ -59,7 +59,7 @@ export default function Home() {
               micro-courses, ask questions, and earn badges for learning together. <br className="hidden lg:block"/>
               Tailored for Nigerian students, by educators who care.
             </p>
-            <Link href="/register/student" className="btn-fill-pill inline-block bg-[#044331] text-white py-3 px-9 rounded-full font-bold text-base transition-all shadow-[0_4px_10px_rgba(4,67,49,0.15)] hover:-translate-y-px hover:shadow-[0_6px_15px_rgba(4,67,49,0.2)] hover:opacity-90 tracking-wide">
+            <Link href="/student" className="btn-fill-pill inline-block bg-[#044331] text-white py-3 px-9 rounded-full font-bold text-base transition-all shadow-[0_4px_10px_rgba(4,67,49,0.15)] hover:-translate-y-px hover:shadow-[0_6px_15px_rgba(4,67,49,0.2)] hover:opacity-90 tracking-wide">
               Get Started
             </Link>
           </div>
@@ -119,7 +119,7 @@ export default function Home() {
                   <p className="text-[1.15rem] text-slate-600 leading-[1.8] mb-8">
                     {step.desc}
                   </p>
-                  <Link href="/register/student" className="text-[#044331] font-bold no-underline flex items-center gap-2 group">
+                  <Link href="/student" className="text-[#044331] font-bold no-underline flex items-center gap-2 group">
                     Start learning with {step.title} 
                     <span className="group-hover:translate-x-1 transition-transform">→</span>
                   </Link>
