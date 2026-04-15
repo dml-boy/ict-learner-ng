@@ -219,17 +219,25 @@ export default function IntroPage({ params }: { params: Promise<{ id: string }> 
             </div>
           </div>
 
-          <div className="text-lg md:text-xl leading-relaxed text-slate-700 whitespace-pre-wrap font-medium">
+          <div className="text-lg md:text-xl leading-[1.8] text-slate-700 whitespace-pre-wrap font-medium lesson-content px-2">
             {currentStep === 2 && personalizedContent && (
-              <div className="mb-8 p-4 bg-primary-glow border-l-4 border-primary rounded-r-xl flex items-center gap-4 animate-float">
-                <span className="text-2xl">🧠</span>
+              <div className="mb-10 p-6 bg-primary-glow border-l-4 border-primary rounded-r-3xl flex items-center gap-6 animate-float shadow-sm">
+                <span className="text-4xl">🧠</span>
                 <div>
-                  <p className="text-[0.6rem] font-black text-primary uppercase tracking-widest">Cognitive Synchronization Active</p>
-                  <p className="text-sm font-bold text-foreground opacity-70">This theoretical core has been curved to address your initial thought: <span className="italic">"{engageAnswer.substring(0, 40)}..."</span></p>
+                  <p className="text-[0.65rem] font-black text-primary uppercase tracking-[0.2em] mb-1">Pedagogical Datalink Active</p>
+                  <p className="text-base font-bold text-foreground opacity-80 leading-relaxed">
+                    This Academic Masterclass has been dynamically curved based on your diagnostic input: 
+                    <span className="italic block mt-1 text-primary">"{engageAnswer.substring(0, 60)}..."</span>
+                  </p>
                 </div>
               </div>
             )}
-            {steps[currentStep].content}
+            
+            {/* Textbook-style content parsing/styling would go here, 
+                for now we enhance the whitespace-pre-wrap container */}
+            <div className="prose prose-slate prose-lg max-w-none">
+              {steps[currentStep].content}
+            </div>
           </div>
 
           {/* Engage — Input Area */}

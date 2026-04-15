@@ -15,7 +15,7 @@ export async function POST(req: Request) {
     const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
     const prompt = `
-      Act as an elite Constructivist Pedagogical Expert. Your goal is to ADAPT a high-quality ICT lesson using the 5E Instructional Model based on a student's initial diagnostic phase.
+      Act as an elite Constructivist Pedagogical Expert and Senior University Professor. Your goal is to ADAPT a high-fidelity ICT lesson using the 5E Instructional Model based on a student's initial diagnostic phase.
       
       Lesson Title: "${moduleTitle}"
       Full Syllabus/Content: "${teacherContent}"
@@ -23,21 +23,21 @@ export async function POST(req: Request) {
       Student's Task Result (Engage/Explore): "${engageAnswer}"
       Student's Diagnostic MCQ Answers (Engage): "${JSON.stringify(engageMCQAnswers)}"
       
-      CRITICAL INSTRUCTION: 
-      1. You must adapt the subsequent phases (Explore, Explain, Elaborate, Evaluate) to address the student's initial thought AND their MCQ choices.
-      2. The EXPLAIN phase is the most critical: It MUST be VAST and EXPLICITLY reference the student's MCQ answers. Bridge their prior knowledge (proven by the MCQs) with deep formal theory. Maximize content length.
-      3. The ELABORATE phase MUST be deep and specific to a ${studentContext} in Nigeria, using the Engage answers as anchor points for the scenarios.
-      4. Ensure all analogies, scenarios, and assessments make sense for their context.
+      ADAPTATION ARCHITECTURE: 
+      1. You must adapt the subsequent phases to address the student's initial thought AND their MCQ choices.
+      2. EXPLAIN phase: This must be an "Academic Masterclass" (at least 8-10 expansive paragraphs). Integrate formal academic definitions with the student's context. Bridge their prior knowledge (proven by the MCQs) with rigorous theory. Maximize depth and length.
+      3. ELABORATE phase: Provide an extensive specific application challenge for a ${studentContext} in Nigeria.
+      4. EVALUATE phase: Provide a technical assessment question and 3 personalized technical MCQ questions STRICTLY based on the adapted Explain content.
 
       Please generate the ADAPTED lesson in the following JSON format ONLY:
       {
-        "explore": "An adapted hands-on investigative task (extended instructions).",
-        "explain": "A VAST, detailed, and personalized theoretical core (at least 5-8 paragraphs).",
+        "explore": "An adapted inquiry discovery task.",
+        "explain": "A VAST, academic, and personalized theoretical core (at least 8 paragraphs).",
         "elaborate": "An extensive specific application challenge for a ${studentContext}.",
-        "evaluate": "An adapted metacognitive reflection question and 3 personalized MCQ assessment questions."
+        "evaluate": "An adapted metacognitive reflection question and 3 rigorous technical MCQ questions."
       }
       
-      Ensure the tone is premium, professional, and encouraging. Return ONLY valid JSON.
+      Ensure the tone is premium, professional, and authoritative. Return ONLY valid JSON.
     `;
 
     const result = await model.generateContent(prompt);

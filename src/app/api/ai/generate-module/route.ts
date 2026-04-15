@@ -22,27 +22,27 @@ export async function POST(req: Request) {
       
       Strictly follow this 5E Constructivist Architecture:
       
-      1. ENGAGE: Generate TWO components: (a) Exactly 5 "Diagnostic/Reflective Multiple Choice Questions" (MCQs) in JSON format to activate schema and gauge prior knowledge. Each question must have 4 options. (b) A "Simple Discovery Task" (e.g., 'Google X', 'Look at your phone's Y') for the student to accomplish immediately. Hook the student!
-      2. EXPLORE: Provide a specific "Hands-on Investigative Task". This should not be reading; it should be a discovery activity where students "play" with a concept.
-      3. EXPLAIN: Provide the "Theoretical Core". Formal definitions and models based on the topic. Generate as much deep, high-quality content as possible. This phase MUST BE BUILT to be dynamically influenced by the student's initial engagement in the Engage phase.
-      4. ELABORATE: For each of the Contextual Personas, create a vast "Real-World Nigerian Scenario" that directly relates the topic back to the personal hooks from the Engage phase. Maximize detail and application.
-      5. EVALUATE: Provide a "Short Test (3 Questions)" in JSON format.
-      
+      1. ENGAGE: (a) Exactly 5 "Diagnostic MCQs" (Radio style) to gauge prior logical intuition. (b) A very BASIC "Simple Discovery Task" (e.g. 'Look at a recipe', 'Notice steps to login').
+      2. EXPLORE: Provide a basic, inquiry-driven discovery task.
+      3. EXPLAIN: Provide an "Academic Masterclass". Act as a Senior University Professor. This section must be MASSIVE (at least 8-10 deep paragraphs, approx 1500 words). It must include: (a) Formal Definition, (b) Historical Context/Origins, (c) Core Technical Architecture/Step-by-step logic, and (d) Industry Applications in the Nigerian ecosystem.
+      4. ELABORATE: Deep contextual scenarios for the personas.
+      5. EVALUATE: Provide a RIGOROUS 3-question test that is STRICTLY based on the technical details provided in the EXPLAIN section.
+
       You MUST return your response in this EXACT JSON structure:
       {
-        "engage": "The text for the Engage phase (intro + the task instructions).",
+        "engage": "The text for the Engage phase.",
         "engageQuestions": [
-          { "question": "...", "options": ["A", "B", "C", "D"], "correctAnswer": 0, "explanation": "..." } // Provide 5 such questions.
+          { "question": "...", "options": ["A", "B", "C", "D"], "correctAnswer": 0, "explanation": "..." } // Provide 5.
         ],
-        "explore": "The text for the Explore phase (the investigative task).",
-        "explain": "The comprehensive theoretical core.",
+        "explore": "The basic inquiry task.",
+        "explain": "The comprehensive academic lesson (MUST BE VAST).",
         "elaborate": {
-           ${contextOptions.map((ctx: string) => `"${ctx}": "A deep contextual application for a ${ctx} referencing the Engage choices."`).join(',\n           ')}
+           ${contextOptions.map((ctx: string) => `"${ctx}": "A deep contextual application."`).join(',\n           ')}
         },
         "evaluate": "A final metacognitive reflection question.",
         "constructivistNote": "Pedagogical rationale.",
         "questions": [
-          { "question": "Test question.", "options": ["A", "B", "C", "D"], "correctAnswer": 0, "explanation": "..." } // Exactly 3 questions.
+          { "question": "Technical test question.", "options": ["A", "B", "C", "D"], "correctAnswer": 0, "explanation": "..." } // Exactly 3.
         ]
       }
       
