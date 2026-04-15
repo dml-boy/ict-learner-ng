@@ -29,10 +29,13 @@ export default function IntroPage({ params }: { params: Promise<{ id: string }> 
   }, [params]);
 
   useEffect(() => {
-    if (id && userId !== 'guest') {
+    // Use universal guest ID fallback
+    const effectiveUserId = userId && userId !== 'guest' ? userId : '65f1234567890abcd1234567';
+
+    if (id) {
       Promise.all([
         fetch(`/api/modules/${id}`).then(res => res.json()),
-        fetch(`/api/progress?userId=${userId}`).then(res => res.json()),
+        fetch(`/api/progress?userId=${effectiveUserId}`).then(res => res.json()),
       ]).then(([modData, progData]) => {
         if (modData.success) setModule(modData.data);
         if (progData.success) {
@@ -57,12 +60,13 @@ export default function IntroPage({ params }: { params: Promise<{ id: string }> 
 
   const saveProgress = useCallback(async (step: number, ctx?: string, ref?: string, answer?: string, pContent?: any) => {
     setSaving(true);
+    const effectiveUserId = userId && userId !== 'guest' ? userId : '65f1234567890abcd1234567';
     try {
       await fetch('/api/progress', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          userId,
+          userId: effectiveUserId,
           moduleId: id,
           status: step === 4 ? 'completed' : 'in-progress',
           currentStep: step,
@@ -76,7 +80,7 @@ export default function IntroPage({ params }: { params: Promise<{ id: string }> 
     } finally {
       setSaving(false);
     }
-  }, [id, selectedContext, reflection, engageAnswer, personalizedContent, userId]);
+  }, [id, selectedContext, reflection, engageAnswer, personalizedContent, userId, engageMCQAnswers]);
 
   const handleContextSelect = async (context: string) => {
     if (!module) return;

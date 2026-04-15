@@ -48,19 +48,19 @@ export default function Home() {
       <LandingHeader />
 
       {/* Hero Section */}
-      <section className="py-24 px-6 max-w-[1140px] mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-[repeat(auto-fit,minmax(320px,1fr))] gap-12 items-center">
+      <section className="py-12 md:py-24 px-4 md:px-6 max-w-[1140px] mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
           <div className="hero-text reveal-up">
-            <h1 className="text-[#044331] text-5xl md:text-[3.2rem] font-black leading-[1.1] mb-6">
-              Learn, Share, Grow <br className="hidden md:block" /> together
+            <h1 className="text-[#044331] text-3xl sm:text-4xl md:text-[3.2rem] font-black leading-[1.15] mb-6 tracking-tight">
+              Learn, Share, <br className="sm:hidden" /> Grow together
             </h1>
-            <p className="text-slate-500 text-[1.1rem] leading-relaxed mb-10 max-w-[540px]">
+            <p className="text-slate-500 text-[1rem] md:text-[1.1rem] leading-relaxed mb-8 md:mb-10 max-w-[540px]">
               ICT Learner NG is a project-powered platform where you share <br className="hidden lg:block"/>
               micro-courses, ask questions, and earn badges for learning together. <br className="hidden lg:block"/>
               Tailored for Nigerian students, by educators who care.
             </p>
-            <Link href="/student" className="btn-fill-pill inline-block bg-[#044331] text-white py-3 px-9 rounded-full font-bold text-base transition-all shadow-[0_4px_10px_rgba(4,67,49,0.15)] hover:-translate-y-px hover:shadow-[0_6px_15px_rgba(4,67,49,0.2)] hover:opacity-90 tracking-wide">
-              Get Started
+            <Link href="/student" className="btn-fill-pill inline-block bg-[#044331] text-white py-2.5 md:py-3 px-7 md:px-9 rounded-full font-bold text-sm md:text-base transition-all shadow-[0_4px_10px_rgba(4,67,49,0.15)] hover:-translate-y-px hover:shadow-[0_6px_15px_rgba(4,67,49,0.2)] hover:opacity-90 tracking-wide">
+              Launch Gateway
             </Link>
           </div>
           <div className="hero-image reveal-up" style={{ transitionDelay: '0.2s' }}>

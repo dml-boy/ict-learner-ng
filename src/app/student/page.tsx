@@ -21,17 +21,12 @@ export default function StudentDashboard() {
   useEffect(() => {
     let isMounted = true;
     
-    if (userId === 'guest') {
-      // Defer to avoid synchronous setState warning in effect
-      Promise.resolve().then(() => {
-        if (isMounted) setLoading(false);
-      });
-      return;
-    }
+    // Use universal guest ID fallback
+    const effectiveUserId = userId && userId !== 'guest' ? userId : '65f1234567890abcd1234567';
     
     Promise.all([
       fetch('/api/modules').then((res) => res.json()),
-      fetch(`/api/progress?userId=${userId}`).then((res) => res.json()),
+      fetch(`/api/progress?userId=${effectiveUserId}`).then((res) => res.json()),
       fetch('/api/leaderboard').then((res) => res.json())
     ])
       .then(([modulesData, progressData, leaderboardData]) => {
@@ -60,8 +55,8 @@ export default function StudentDashboard() {
 
   const stats = [
     { label: 'Available', value: modules.length, icon: '📂' },
-    { label: 'Mastered', value: progress.filter((p: StudentProgress) => p.status === 'completed').length, icon: '🛡️' },
-    { label: 'In Orbit', value: modules.length - progress.filter((p: StudentProgress) => p.status === 'completed').length, icon: '🚀' },
+    { label: 'Mastered', value: (progress || []).filter((p: StudentProgress) => p?.status === 'completed').length, icon: '🛡️' },
+    { label: 'In Orbit', value: modules.length - (progress || []).filter((p: StudentProgress) => p?.status === 'completed').length, icon: '🚀' },
   ];
 
   return (
@@ -120,78 +115,81 @@ export default function StudentDashboard() {
 
           {/* Module List Grid */}
           <div className="dashboard-grid animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
-            {modules.map((mod: Module) => {
-              const status = getModuleStatus(mod._id);
-              const isCompleted = status === 'completed';
-              const isInProgress = status === 'in-progress';
+              {modules.map((mod: Module) => {
+                const status = mod ? getModuleStatus(mod._id) : 'available';
+                const isCompleted = status === 'completed';
+                const isInProgress = status === 'in-progress';
+                const topicTitle = (mod?.topicId && typeof mod.topicId === 'object') 
+                                   ? (mod.topicId as any).title 
+                                   : 'CORE ICT';
 
-              return (
-                <div 
-                  key={mod._id} 
-                  className="peak-card flex flex-col p-10 group cursor-pointer hover:shadow-2xl transition-all duration-700 hover:-translate-y-3 glossy-border"
-                  onClick={() => router.push(`/student/learn/${mod._id}/intro`)}
-                >
-                  <div className="flex justify-between items-start mb-10">
-                    <div className="tag-nigeria text-[0.7rem] font-black uppercase tracking-widest">
-                      {typeof mod.topicId === 'object' ? mod.topicId.title.substring(0, 15) : 'CORE ICT'}
+                return (
+                  <div 
+                    key={mod?._id || Math.random()} 
+                    className="peak-card flex flex-col p-10 group cursor-pointer hover:shadow-2xl transition-all duration-700 hover:-translate-y-3 glossy-border"
+                    onClick={() => mod && router.push(`/student/learn/${mod._id}/intro`)}
+                  >
+                    <div className="flex justify-between items-start mb-10">
+                      <div className="tag-nigeria text-[0.7rem] font-black uppercase tracking-widest">
+                        {topicTitle.substring(0, 15)}
+                      </div>
+                      <div className={`text-2xl w-14 h-14 flex items-center justify-center rounded-2xl transition-all duration-700 ${isCompleted ? 'bg-secondary/10 rotate-[360deg]' : 'bg-primary-glow group-hover:bg-primary/20'}`}>
+                        {isCompleted ? '🛡️' : isInProgress ? '⚡' : '🔮'}
+                      </div>
                     </div>
-                    <div className={`text-2xl w-14 h-14 flex items-center justify-center rounded-2xl transition-all duration-700 ${isCompleted ? 'bg-secondary/10 rotate-[360deg]' : 'bg-primary-glow group-hover:bg-primary/20'}`}>
-                      {isCompleted ? '🛡️' : isInProgress ? '⚡' : '🔮'}
-                    </div>
-                  </div>
-                  <h4 className="text-2xl font-black mb-4 text-foreground group-hover:text-primary transition-colors leading-tight tracking-tight">
-                    {mod.title}
-                  </h4>
-                  <p className="text-sm text-text-muted mb-10 italic leading-relaxed flex-1 opacity-80 line-clamp-2">
-                     &quot;{mod.content.substring(0, 100)}...&quot;
-                  </p>
-                  <div className="flex justify-between items-center mt-auto pt-8 border-t border-primary/5">
-                    <div className="flex flex-col">
-                      <span className={`text-[0.65rem] font-black tracking-[0.2em] uppercase ${isCompleted ? 'text-secondary' : isInProgress ? 'text-primary' : 'text-text-muted opacity-40'}`}>
-                        {isCompleted ? 'MASTERY' : isInProgress ? 'UPLINK' : 'READY'}
-                      </span>
-                      <span className="text-[0.6rem] font-bold text-text-muted/40 mt-1 uppercase">Phase 1.0</span>
-                    </div>
-                    <button className="btn btn-primary text-[0.75rem] px-6 py-3 rounded-xl shadow-lg group-hover:scale-105 transition-transform">
-                      {isCompleted ? 'Review' : 'Start'}
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Insights Column */}
-        <aside className="insights-panel animate-fade-in-right" style={{ animationDelay: '0.4s' }}>
-          <div className="peak-card p-8 bg-card-bg border-none shadow-none mb-8">
-            <h4 className="text-lg font-black mb-6 flex items-center gap-3 text-primary">
-              <span className="text-2xl">👥</span> Top Learners
-            </h4>
-            <div className="flex flex-col gap-6">
-              {leaderboard.length === 0 ? (
-                <p className="text-text-muted text-sm italic font-medium">No activity detected yet. Be the first to initiate an uplink!</p>
-              ) : (
-                leaderboard.slice(0, 3).map((learner: LeaderboardEntry, i: number) => (
-                  <div key={i} className="flex gap-4 items-start group">
-                    <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center font-black text-primary text-sm shadow-sm transition-transform group-hover:scale-110 shrink-0">
-                      {learner.name ? learner.name[0] : 'A'}
-                    </div>
-                    <div>
-                      <p className="text-sm font-bold text-foreground">
-                        {learner.name || 'Anonymous Learner'} 
-                        <span className="font-medium text-text-muted text-xs block mt-0.5">
-                          mastered {learner.totalCompleted} modules
+                    <h4 className="text-2xl font-black mb-4 text-foreground group-hover:text-primary transition-colors leading-tight tracking-tight">
+                      {mod?.title || 'Untitled Module'}
+                    </h4>
+                    <p className="text-sm text-text-muted mb-10 italic leading-relaxed flex-1 opacity-80 line-clamp-2">
+                       &quot;{mod?.content?.substring(0, 100) || 'Loading educational synthesis...'}...&quot;
+                    </p>
+                    <div className="flex justify-between items-center mt-auto pt-8 border-t border-primary/5">
+                      <div className="flex flex-col">
+                        <span className={`text-[0.65rem] font-black tracking-[0.2em] uppercase ${isCompleted ? 'text-secondary' : isInProgress ? 'text-primary' : 'text-text-muted opacity-40'}`}>
+                          {isCompleted ? 'MASTERY' : isInProgress ? 'UPLINK' : 'READY'}
                         </span>
-                      </p>
-                      <p className="text-[0.7rem] text-text-muted font-black opacity-50 uppercase tracking-wider mt-1">
-                        {learner.completionRate > 0 ? `${Math.round(learner.completionRate)}% Sync Rate` : 'Initializing'}
-                      </p>
+                        <span className="text-[0.6rem] font-bold text-text-muted/40 mt-1 uppercase">Phase 1.0</span>
+                      </div>
+                      <button className="btn btn-primary text-[0.75rem] px-6 py-3 rounded-xl shadow-lg group-hover:scale-105 transition-transform">
+                        {isCompleted ? 'Review' : 'Start'}
+                      </button>
                     </div>
                   </div>
-                ))
-              )}
+                );
+              })}
             </div>
+          </div>
+ 
+          {/* Insights Column */}
+          <aside className="insights-panel animate-fade-in-right" style={{ animationDelay: '0.4s' }}>
+            <div className="peak-card p-8 bg-card-bg border-none shadow-none mb-8">
+              <h4 className="text-lg font-black mb-6 flex items-center gap-3 text-primary">
+                <span className="text-2xl">👥</span> Top Learners
+              </h4>
+              <div className="flex flex-col gap-6">
+                {leaderboard.length === 0 ? (
+                  <p className="text-text-muted text-sm italic font-medium">No activity detected yet. Be the first to initiate an uplink!</p>
+                ) : (
+                  leaderboard.slice(0, 3).map((learner: LeaderboardEntry, i: number) => (
+                    <div key={i} className="flex gap-4 items-start group">
+                      <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center font-black text-primary text-sm shadow-sm transition-transform group-hover:scale-110 shrink-0">
+                        {learner?.name ? learner.name[0] : 'A'}
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-foreground">
+                          {learner?.name || 'Anonymous Learner'} 
+                          <span className="font-medium text-text-muted text-xs block mt-0.5">
+                            mastered {learner?.totalCompleted || 0} modules
+                          </span>
+                        </p>
+                        <p className="text-[0.7rem] text-text-muted font-black opacity-50 uppercase tracking-wider mt-1">
+                          {(learner?.completionRate || 0) > 0 ? `${Math.round(learner.completionRate)}% Sync Rate` : 'Initializing'}
+                        </p>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
             <Link href="/student/achievements" className="btn btn-outline w-full mt-8 text-[0.7rem] py-3 border-primary/10 hover:bg-primary hover:text-white hover:border-primary transition-all">🏆 View Full Leaderboard</Link>
           </div>
         </aside>
