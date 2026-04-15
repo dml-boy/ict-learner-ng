@@ -32,6 +32,14 @@ const ModuleSchema: Schema = new Schema(
     type: { type: String, enum: ['lesson', 'activity', 'project'], default: 'lesson' },
     // 5E Framework
     engage: { type: String, default: '' },
+    engageQuestions: [
+      {
+        question: { type: String },
+        options: [{ type: String }],
+        correctAnswer: { type: Number },
+        explanation: { type: String },
+      },
+    ],
     explore: { type: String, default: '' },
     explain: { type: String, default: '' },
     elaborate: { type: Map, of: String, default: {} },

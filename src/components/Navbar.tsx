@@ -85,7 +85,7 @@ export default function Navbar({
           <div className={styles.avatar}>{initial}</div>
           <div className={styles.userInfo}>
             <p className={styles.userName}>{userName}</p>
-            <p className={styles.userRole}>{userRole.charAt(0).toUpperCase() + userRole.slice(1)} Account</p>
+            <p className={styles.userRole}>Verified Identity</p>
           </div>
         </div>
       </div>

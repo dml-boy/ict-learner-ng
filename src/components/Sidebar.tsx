@@ -129,6 +129,3 @@ export default function Sidebar({ isOpen, setIsOpen }: {
     </aside>
   );
 }
-    </aside>
-  );
-}

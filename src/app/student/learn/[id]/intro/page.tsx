@@ -259,22 +259,35 @@ export default function IntroPage({ params }: { params: Promise<{ id: string }> 
                     <span className="text-xl">🧠</span> Diagnostic Diagnostics (5 Questions)
                   </label>
                   {module.engageQuestions.map((q, qIdx) => (
-                    <div key={qIdx} className="space-y-4">
-                      <p className="font-bold text-xl text-foreground">{qIdx + 1}. {q.question}</p>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div key={qIdx} className="space-y-6 p-8 bg-slate-50/50 rounded-[32px] border border-slate-100">
+                      <p className="font-black text-xl text-[#044331]">{qIdx + 1}. {q.question}</p>
+                      <div className="flex flex-col gap-3">
                         {q.options.map((opt, oIdx) => (
-                          <button
+                          <label
                             key={oIdx}
-                            onClick={() => {
-                              const newAns = [...engageMCQAnswers];
-                              newAns[qIdx] = oIdx;
-                              setEngageMCQAnswers(newAns);
-                            }}
-                            disabled={!!personalizedContent}
-                            className={`p-4 text-left rounded-2xl border-2 transition-all font-bold ${engageMCQAnswers[qIdx] === oIdx ? 'border-primary bg-primary/10 text-primary' : 'border-border/40 hover:border-primary/30 text-slate-600'}`}
+                            className={`flex items-center gap-4 p-5 rounded-2xl border-2 transition-all cursor-pointer font-bold ${engageMCQAnswers[qIdx] === oIdx ? 'border-primary bg-primary/5 text-primary' : 'border-border/40 hover:border-primary/20 text-slate-600'}`}
                           >
-                            {opt}
-                          </button>
+                            <div className="relative flex items-center justify-center">
+                              <input
+                                type="radio"
+                                name={`q-${qIdx}`}
+                                checked={engageMCQAnswers[qIdx] === oIdx}
+                                onChange={() => {
+                                  const newAns = [...engageMCQAnswers];
+                                  newAns[qIdx] = oIdx;
+                                  setEngageMCQAnswers(newAns);
+                                }}
+                                disabled={!!personalizedContent}
+                                className="sr-only"
+                              />
+                              <div className={`w-6 h-6 rounded-full border-2 transition-all ${engageMCQAnswers[qIdx] === oIdx ? 'border-primary' : 'border-slate-300'}`}>
+                                {engageMCQAnswers[qIdx] === oIdx && (
+                                  <div className="absolute inset-1.5 bg-primary rounded-full animate-scale-in" />
+                                )}
+                              </div>
+                            </div>
+                            <span className="text-lg">{opt}</span>
+                          </label>
                         ))}
                       </div>
                     </div>
