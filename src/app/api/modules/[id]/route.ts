@@ -15,11 +15,13 @@ export async function GET(
       populate: { path: 'subjectId' }
     });
     if (!moduleDoc) {
+      console.warn(`[API] Module ${id} not found.`);
       return NextResponse.json({ success: false, error: 'Module not found' }, { status: 404 });
     }
     return NextResponse.json({ success: true, data: moduleDoc });
   } catch (error) {
-    return NextResponse.json({ success: false, error: (error as Error).message }, { status: 500 });
+    console.error(`[API] Critical error fetching module ${id}:`, error);
+    return NextResponse.json({ success: false, error: "System synchronization failure. The module metadata may be fragmented." }, { status: 500 });
   }
 }
 

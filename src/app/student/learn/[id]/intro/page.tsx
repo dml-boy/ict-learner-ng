@@ -37,7 +37,8 @@ export default function IntroPage({ params }: { params: Promise<{ id: string }> 
         if (modData.success) setModule(modData.data);
         if (progData.success) {
           const prog = progData.data.find((p: StudentProgress) => {
-            const mId = typeof p.moduleId === 'object' ? (p.moduleId as Module)._id : p.moduleId;
+            if (!p || !p.moduleId) return false;
+            const mId = typeof p.moduleId === 'object' ? (p.moduleId as any)._id : p.moduleId;
             return mId === id;
           });
           if (prog?.selectedContext) setSelectedContext(prog.selectedContext);
