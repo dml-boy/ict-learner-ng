@@ -7,9 +7,9 @@ export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   await dbConnect();
   try {
-    const { id } = await params;
     const moduleDoc = await Module.findById(id).populate({
       path: 'topicId',
       populate: { path: 'subjectId' }
@@ -30,9 +30,9 @@ export async function DELETE(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   await dbConnect();
   try {
-    const { id } = await params;
     const deletedModule = await Module.findByIdAndDelete(id);
     if (!deletedModule) {
       return NextResponse.json({ success: false, error: 'Module not found' }, { status: 404 });

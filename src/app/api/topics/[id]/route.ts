@@ -7,9 +7,9 @@ export async function DELETE(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   await dbConnect();
   try {
-    const { id } = await params;
     const deletedTopic = await Topic.findByIdAndDelete(id);
     if (!deletedTopic) {
       return NextResponse.json({ success: false, error: 'Topic not found' }, { status: 404 });
