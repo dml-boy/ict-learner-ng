@@ -38,29 +38,33 @@ export default function StudentModules() {
   }, [userId]);
 
   const getModuleStatus = (moduleId: string) => {
+    if (!progress) return 'available';
     const prog = progress.find(p => {
-      const mid = typeof p.moduleId === 'object' ? (p.moduleId as Module)._id : p.moduleId;
+      if (!p || !p.moduleId) return false;
+      const mid = typeof p.moduleId === 'object' ? (p.moduleId as Module)?._id : p.moduleId;
       return mid === moduleId;
     });
     return prog?.status || 'available';
   };
 
   const getTopicsForSubject = (subjectId: string) =>
-    topics.filter(t => {
-      const sid = typeof t.subjectId === 'object' ? t.subjectId._id : t.subjectId;
+    (topics || []).filter(t => {
+      if (!t || !t.subjectId) return false;
+      const sid = typeof t.subjectId === 'object' ? (t.subjectId as any)?._id : t.subjectId;
       return sid === subjectId;
     });
 
   const getModulesForTopic = (topicId: string) =>
-    modules.filter(m => {
-      const tid = typeof m.topicId === 'object' ? m.topicId._id : m.topicId;
+    (modules || []).filter(m => {
+      if (!m || !m.topicId) return false;
+      const tid = typeof m.topicId === 'object' ? (m.topicId as any)?._id : m.topicId;
       return tid === topicId;
     });
 
   const filteredSubjects = activeSubject === 'all' ? subjects : subjects.filter(s => s._id === activeSubject);
 
-  const totalCompleted = progress.filter(p => p.status === 'completed').length;
-  const totalInProgress = progress.filter(p => p.status === 'in-progress').length;
+  const totalCompleted = (progress || []).filter(p => p?.status === 'completed').length;
+  const totalInProgress = (progress || []).filter(p => p?.status === 'in-progress').length;
 
   return (
     <div className="animate-fade-in pb-24">
@@ -129,29 +133,29 @@ export default function StudentModules() {
       ) : (
         <div className="flex flex-col gap-16 px-2">
           {filteredSubjects.map(subject => {
-            const subjectTopics = getTopicsForSubject(subject._id);
-            const subjectModules = subjectTopics.flatMap(t => getModulesForTopic(t._id));
-            const completedCount = subjectModules.filter(m => getModuleStatus(m._id) === 'completed').length;
+            const subjectTopics = getTopicsForSubject(subject?._id);
+            const subjectModules = subjectTopics.flatMap(t => getModulesForTopic(t?._id));
+            const completedCount = subjectModules.filter(m => m?._id && getModuleStatus(m._id) === 'completed').length;
 
             return (
-              <div key={subject._id} className="animate-fade-in">
+              <div key={subject?._id} className="animate-fade-in">
                 {/* Sector Header */}
-                <div className="flex flex-col sm:flex-row sm:items-center gap-6 mb-10 pb-8 border-b-2 transition-all group" style={{ borderBottomColor: `${subject.color}20` }}>
-                  <div className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 flex items-center justify-center rounded-2xl md:rounded-3xl text-3xl md:text-4xl shadow-2xl group-hover:scale-110 transition-transform duration-500 relative overflow-hidden shrink-0" style={{ background: `${subject.color}10`, color: subject.color }}>
-                    {subject.icon?.startsWith('http') ? (
-                      <Image src={subject.icon} alt={subject.title} fill className="object-cover" />
+                <div className="flex flex-col sm:flex-row sm:items-center gap-6 mb-10 pb-8 border-b-2 transition-all group" style={{ borderBottomColor: `${subject?.color}20` }}>
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 flex items-center justify-center rounded-2xl md:rounded-3xl text-3xl md:text-4xl shadow-2xl group-hover:scale-110 transition-transform duration-500 relative overflow-hidden shrink-0" style={{ background: `${subject?.color}10`, color: subject?.color }}>
+                    {subject?.icon?.startsWith('http') ? (
+                      <Image src={subject.icon} alt={subject.title || 'Subject'} fill className="object-cover" />
                     ) : (
-                      subject.icon
+                      subject?.icon
                     )}
                   </div>
                   <div className="flex-1">
                     <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-3">
-                      <h2 className="text-2xl md:text-4xl lg:text-5xl font-black tracking-tight leading-tight">{subject.title}</h2>
-                      <div className="px-4 py-1.5 rounded-full text-[0.65rem] font-black uppercase tracking-widest border-2 shadow-sm w-fit" style={{ backgroundColor: `${subject.color}05`, color: subject.color, borderColor: `${subject.color}20` }}>
+                      <h2 className="text-2xl md:text-4xl lg:text-5xl font-black tracking-tight leading-tight">{subject?.title}</h2>
+                      <div className="px-4 py-1.5 rounded-full text-[0.65rem] font-black uppercase tracking-widest border-2 shadow-sm w-fit" style={{ backgroundColor: `${subject?.color}05`, color: subject?.color, borderColor: `${subject?.color}20` }}>
                         SYNC: {completedCount}/{subjectModules.length} STAGES
                       </div>
                     </div>
-                    <p className="text-text-muted text-sm md:text-base lg:text-lg italic opacity-80">&quot;{subject.description}&quot;</p>
+                    <p className="text-text-muted text-sm md:text-base lg:text-lg italic opacity-80">&quot;{subject?.description}&quot;</p>
                   </div>
                 </div>
 
@@ -160,15 +164,15 @@ export default function StudentModules() {
                 ) : (
                   <div className="flex flex-col gap-14 ml-4 md:ml-12 border-l-2 border-border/20 pl-6 md:pl-12">
                     {subjectTopics.map(topic => {
-                      const topicModules = getModulesForTopic(topic._id);
+                      const topicModules = getModulesForTopic(topic?._id);
                       return (
-                        <div key={topic._id}>
+                        <div key={topic?._id}>
                           {/* Cluster Label */}
                           <div className="flex items-center gap-4 mb-8 group/topic">
-                            <div className="w-1.5 h-8 md:h-10 rounded-full transition-all group-hover/topic:scale-y-125" style={{ background: subject.color }} />
+                            <div className="w-1.5 h-8 md:h-10 rounded-full transition-all group-hover/topic:scale-y-125" style={{ background: subject?.color }} />
                             <div>
-                              <h3 className="text-xl md:text-2xl font-black text-foreground/90 group-hover/topic:text-primary transition-colors">{topic.title}</h3>
-                              {topic.description && <p className="text-xs md:text-sm text-text-muted italic opacity-70 mt-1">{topic.description}</p>}
+                              <h3 className="text-xl md:text-2xl font-black text-foreground/90 group-hover/topic:text-primary transition-colors">{topic?.title}</h3>
+                              {topic?.description && <p className="text-xs md:text-sm text-text-muted italic opacity-70 mt-1">{topic.description}</p>}
                             </div>
                           </div>
 
@@ -177,26 +181,26 @@ export default function StudentModules() {
                           ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                               {topicModules.map(mod => {
-                                const status = getModuleStatus(mod._id);
+                                const status = mod?._id ? getModuleStatus(mod._id) : 'available';
                                 const isCompleted = status === 'completed';
                                 const isInProgress = status === 'in-progress';
-                                const typeClass = TYPE_COLORS[mod.type] || 'text-primary bg-primary/10';
+                                const typeClass = TYPE_COLORS[mod?.type || 'lesson'] || 'text-primary bg-primary/10';
 
                                 return (
                                   <div
-                                    key={mod._id}
+                                    key={mod?._id}
                                     className={`peak-card flex flex-col p-7 border-t-4 transition-all duration-300 hover:scale-[1.02] cursor-pointer group/card ${isCompleted ? 'border-emerald-500/50 grayscale-[0.3]' : 'hover:shadow-2xl'}`}
-                                    style={{ borderTopColor: isCompleted ? '#10b981' : subject.color }}
-                                    onClick={() => router.push(`/student/learn/${mod._id}/intro`)}
+                                    style={{ borderTopColor: isCompleted ? '#10b981' : subject?.color }}
+                                    onClick={() => router.push(`/student/learn/${mod?._id}/intro`)}
                                   >
                                     <div className="flex justify-between items-start mb-6">
                                       <div className="flex flex-col gap-2">
                                         <div className={`px-3 py-1 rounded-full text-[0.65rem] font-black uppercase tracking-widest w-fit ${typeClass}`}>
-                                          {TYPE_ICONS[mod.type]} {mod.type}
+                                          {TYPE_ICONS[mod?.type || 'lesson']} {mod?.type || 'lesson'}
                                         </div>
-                                        {mod.createdBy && (
+                                        {mod?.createdBy && (
                                           <div className="text-[0.6rem] text-text-muted font-bold uppercase tracking-tighter opacity-50 group-hover/card:opacity-100 transition-opacity whitespace-nowrap flex items-center gap-1">
-                                            <span>🤵</span> ARCHITECT: {mod.createdBy.name}
+                                            <span>🤵</span> ARCHITECT: {mod.createdBy.name || 'ANONYMOUS'}
                                           </div>
                                         )}
                                       </div>
